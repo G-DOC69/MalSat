@@ -1,20 +1,20 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate ,Link } from 'react-router-dom';
-import {getUserR, loginUserR} from '../../app/tempApi.js';
 import {UserContext} from "../../App.jsx";
 import './LoginPageStyle.css';
+import { loginUserRequest} from "../../app/api.js";
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
-        username: '',
+        email: '',
         password: '',
     });
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const { setUser } = useContext(UserContext);
+    const [, setUser ] = useContext(UserContext);
 
-    const validateUsername = (username) => {
-        return /^[A-Za-zА-Яа-яЁё0-9]{1,20}$/.test(username);
+    const validateEmail = (email) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     };
 
     const validatePassword = (password) => {
@@ -28,7 +28,7 @@ const LoginPage = () => {
         let error = '';
         switch (name) {
             case 'username':
-                if (!validateUsername(value)) error = 'Неверный формат имени пользователя';
+                if (!validateEmail(value)) error = 'Неверный формат электронной почты';
                 break;
             case 'password':
                 if (!validatePassword(value)) error = 'Неверный формат пароля';
@@ -44,18 +44,16 @@ const LoginPage = () => {
         setError(null);
 
         try {
-            const response = await loginUserR(formData);
-            if (response.status === 200 && response.data.token) {
-                localStorage.setItem('access_token', response.data.token)
-                const token = localStorage.getItem('access_token');
-                await getUserR(token)
-                setUser(getUserR.data);
-                navigate('/confirm-mail');
+            const response = await loginUserRequest(formData);
+            if (response.status === 200 && response.data) {
+                localStorage.setItem('access_token', response.data)
+                setUser(true)
+                navigate("/")
             } else {
                 setError(response.message || 'Ошибка входа!');
             }
         } catch (err) {
-            setError(err||'Ошибка сервера! Попробуйте позже.');
+            setError(err.message||'Ошибка сервера! Попробуйте позже.');
         }
     };
 
@@ -63,7 +61,7 @@ const LoginPage = () => {
         <div className="login-container">
             <form onSubmit={handleSubmit} className="login-form">
                 <h2>Вход</h2>
-                <input type="text" name="username" placeholder="Имя пользователя" value={formData.username} onChange={handleChange} required />
+                <input type="email" name="email" placeholder="Адрес Электронной почты" value={formData.email} onChange={handleChange} required />
                 <input type="password" name="password" placeholder="Пароль" value={formData.password} onChange={handleChange} required />
                 <button type="submit">Войти</button>
             </form>

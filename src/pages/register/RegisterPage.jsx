@@ -1,8 +1,8 @@
 import './RegisterPageStyle.css';
 import React, { useState } from 'react';
 import {Link, useNavigate} from 'react-router-dom';
-import {registerUserR} from '../../app/tempApi.js';
 import countryPhoneCodes from '../../app/countryPhoneCodes.jsx';
+import {registerUserRequest} from "../../app/api.js";
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -85,9 +85,16 @@ const RegisterPage = () => {
         }
 
         try {
-            const response = await registerUserR(formData);
+            const newFormData = {
+            ...formData,
+            photoUrl: null
+            };
+            delete newFormData.confirmPassword;
+            const response = await registerUserRequest(newFormData);
+            console.log(response);
+            console.log(formData);
             if (response.status === 200 || response.status === 201) {
-                navigate('/confirm-email');
+                navigate('/login/confirm-email');
             } else {
                 setErrorMessage('Ошибка Сервера, Попробуйте Позже!')
             }

@@ -3,6 +3,7 @@ import './TopBarStyle.css';
 import {Link, useNavigate} from 'react-router-dom';
 import { UserContext } from "../../App.jsx";
 import {getNewMessagesCountR, getUserNotificationsR} from "../../app/tempApi.js";
+import {getUserNotificationsRequest} from "../../app/api.js";
 
 const Topbar = () => {
     const [user,setUser] = useContext(UserContext);

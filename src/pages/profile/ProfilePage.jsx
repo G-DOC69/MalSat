@@ -3,8 +3,8 @@ import './ProfilePageStyle.css'
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../App.jsx';
-import {getUserByIdR, getUserR} from "../../app/tempApi.js";
-// import {getUserAds, getUserProfile} from "../../app/api.js";
+import {getAdsByUserId, getUserByIdRequest, getUserRequest} from "../../app/api.js";
+import {useCheckUser} from "../../hooks/useCheckUser.js";
 
 const ProfilePage = () => {
     const { id } = useParams();
@@ -18,6 +18,8 @@ const ProfilePage = () => {
     const [loading, setLoading] = useState(true);
     const token = localStorage.getItem("access_token")
 
+    useCheckUser()
+
     useEffect(() => {
         setLoading(true);
         if (id) {
@@ -29,12 +31,12 @@ const ProfilePage = () => {
 
     const fetchProfile = async (id) => {
         try {
-            const response = await getUserByIdR(id,token)
-
+            const response = await getUserByIdRequest(id,token)
             setProfile(response.data);
-            setAllAds(response.data.all_ads);
-            setAds(response.data.all_ads.slice(0, 10));
-            if (response.data.all_ads.length > 10) {
+            const backads = await getAdsByUserId(id,token);
+            setAllAds(backads.data);
+            setAds(backads.data.slice(0, 10));
+            if (backads.data.length > 10) {
                 setHasMoreAds(true);
             } else {
                 setHasMoreAds(false);
@@ -48,15 +50,10 @@ const ProfilePage = () => {
 
     const fetchOwnProfile = async () => {
         try {
-            const ownResponse = await getUserR(token)
+            const ownResponse = await getUserRequest(token)
             setProfile(ownResponse.data);
-            setAllAds(ownResponse.data.all_ads);
-            setAds(ownResponse.data.all_ads.slice(0, 10));
-            if (ownResponse.data.all_ads.length > 10) {
-                setHasMoreAds(true);
-            } else {
-                setHasMoreAds(false);
-            }
+            setAllAds(null);
+            setAds(null);
         } catch (error) {
             console.error('Ошибка загрузки собственного профиля:', error);
         } finally {
@@ -86,9 +83,9 @@ const ProfilePage = () => {
                 </div>
             </div>
 
-            <h3>Объявления пользователя</h3>
+            {ads &&(<h3>Объявления пользователя</h3>)}
             <div className="ads-container">
-                {ads.map(ad => (
+                {ads?.map(ad => (
                     <div key={ad.id} className="ad-card" onClick={() => navigate(`/ad/${ad.id}`)}>
                         <img src={ad.photo} alt={`${ad.animal} ${ad.breed}`}/>
                         <p>{ad.animal} {ad.breed}</p>

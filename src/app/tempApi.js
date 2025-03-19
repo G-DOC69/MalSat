@@ -117,15 +117,13 @@ export const postAdR = async (token,formData)=>{
 
 
 // other get requests
-export const getAnimalsListR = async (token) => {
-    console.log(token)
+export const getAnimalsListR = async () => {
     return {
         data:["Корова", "Овца", "Курица", "Осел", "Лошадь"],
         status:200,
     }
 }
-export const getNewMessagesCountR = async (token) => {
-    console.log(token)
+export const getNewMessagesCountR = async () => {
     return {
         status:200,
         data:[
@@ -251,3 +249,5 @@ export const getChatIdR = async (id,token) => {
         }
     }
 }
+export const sendMessageR = async (chatId,token,formData)=>{}
+export const getChatR = async (id,token)=>{}

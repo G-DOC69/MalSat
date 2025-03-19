@@ -2,31 +2,46 @@ import './ChangeProfilePageStyle.css'
 import { useState, useEffect } from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import {useCheckUser} from "../../hooks/useCheckUser.js";
-import {updateUserProfileR} from "../../app/tempApi.js";
+import {getUserRequest, updateUserProfileRequest} from "../../app/api.js";
 
-const ChangeProfilePage = ({ user }) => {
+const ChangeProfilePage = () => {
     const [formData, setFormData] = useState({
         username: '',
-        photo: null,
+        photoUrl: null,
+        email:'',
         phone: '',
         password: ''
     });
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
 
     useCheckUser()
 
-    useEffect(() => {
-        if (user) {
-            setFormData({
-                username: user.username || 'exampleUserName',
-                photo: user.photo  || 'examplePhoto',
-                phone: user.phone || '+996999999999',
-                password: ''
-            });
+    useEffect( () => {
+        const fetchData = async () => {
+            const response = await getUserRequest(token)
+            {response &&(
+                setFormData({
+                    username: response.data.username,
+                    photoUrl: response.data.photoUrl,
+                    email: response.data.email,
+                    phone: response.data.phone,
+                    password: ''
+                })
+            )}
+            {!response &&(
+                setFormData({
+                    username:'exampleUserName',
+                    photoUrl:null,
+                    email:'example@gmail.com',
+                    phone:'+996999999999',
+                    password: ''
+                })
+            )}
         }
-    }, [user]);
+        fetchData()
+    }, []);
 
     const handleChange = (e) => {
         const { name, value, type, files } = e.target;
@@ -41,7 +56,11 @@ const ChangeProfilePage = ({ user }) => {
         e.preventDefault();
         setError('');
         try {
-            const response = await updateUserProfileR(token,formData);
+            const updatedFormData = {
+                ...formData,
+                photoUrl: null
+            };
+            const response = await updateUserProfileRequest(token,updatedFormData);
             if (response.status === 200 || response.status === 201) {
                 navigate('/profile');
             }
@@ -68,6 +87,14 @@ const ChangeProfilePage = ({ user }) => {
                     name="photo"
                     accept="image/*"
                     onChange={handleChange}
+                />
+                <label>Адрес Электронной почты:</label>
+                <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
                 />
                 <label>Номер телефона:</label>
                 <input

@@ -1,8 +1,9 @@
 import './PostAdPageStyle.css'
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAnimalsListR, postAdR} from "../../app/tempApi.js";
+import { getAnimalsListR} from "../../app/tempApi.js";
 import {useCheckUser} from "../../hooks/useCheckUser.js";
+import {postAdRequest} from "../../app/api.js";
 
 
 const PostAdPage = () => {
@@ -26,7 +27,7 @@ const PostAdPage = () => {
         const fetchAdEssentials = async () => {
             try {
                 let animalsList = await getAnimalsListR(token);
-                setAnimals(animalsList);
+                setAnimals(animalsList.data);
             } catch (err) {
                 setError(err||'Ошибка загрузки объявления.');
             }
@@ -53,7 +54,7 @@ const PostAdPage = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await postAdR(token, formData);
+            const response = await postAdRequest(token, formData);
             if (response.status === 200 || response.status === 201) {
                 navigate('/ad/my-ads');
             }

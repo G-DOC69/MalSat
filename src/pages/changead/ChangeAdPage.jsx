@@ -1,8 +1,9 @@
 import './ChangeAdPageStyle.css'
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {getAdR, getAnimalsListR, updateAdR} from "../../app/tempApi.js";
+import {getAnimalsListR} from "../../app/tempApi.js";
 import {useCheckUser} from "../../hooks/useCheckUser.js";
+import {getAdRequest, updateAdRequest} from "../../app/api.js";
 
 const ChangeAdPage = () => {
     const { id } = useParams();
@@ -31,7 +32,7 @@ const ChangeAdPage = () => {
     useEffect(() => {
         const fetchAdData = async () => {
             try {
-                const adData = await getAdR(id,token);
+                const adData = await getAdRequest(id,token);
                 let animalsList = await getAnimalsListR(token);
                 setFormData({
                     animal: adData.data.animal,
@@ -55,21 +56,21 @@ const ChangeAdPage = () => {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handlePhotoUpload = (e) => {
-        const files = Array.from(e.target.files);
-        if (files.length + formData.photos.length > 10) {
-            setError('Максимум 10 фото!');
-            return;
-        }
-        setFormData((prev) => ({ ...prev, photos: [...prev.photos, ...files] }));
-    };
+    // const handlePhotoUpload = (e) => {
+    //     const files = Array.from(e.target.files);
+    //     if (files.length + formData.photos.length > 10) {
+    //         setError('Максимум 10 фото!');
+    //         return;
+    //     }
+    //     setFormData((prev) => ({ ...prev, photos: [...prev.photos, ...files] }));
+    // };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
         try {
-            const response = await updateAdR(id,token, formData);
+            const response = await updateAdRequest(id,token, formData);
             if (response.status === 200 || response.status === 201) {
                 navigate('/ad/my-ads');
             }
@@ -89,9 +90,9 @@ const ChangeAdPage = () => {
                 <label>
                     Животное:
                     <select name="animal" value={formData.animal} onChange={handleChange} required>
-                        {animals.map((animal) => (
-                            <option key={animal} value={animal}>{animal}</option>
-                        ))}
+                        {/*{animals.map((animal) => (*/}
+                        {/*    <option key={animal} value={animal}>{animal}</option>*/}
+                        {/*))}*/}
                     </select>
                 </label>
                 <label>
@@ -110,10 +111,10 @@ const ChangeAdPage = () => {
                     Описание:
                     <textarea name="description" value={formData.description} onChange={handleChange} maxLength="2000" required />
                 </label>
-                <label>
-                    Фото (макс. 10):
-                    <input type="file" multiple accept="image/*" onChange={handlePhotoUpload} />
-                </label>
+                {/*<label>*/}
+                {/*    Фото (макс. 10):*/}
+                {/*    <input type="file" multiple accept="image/*" onChange={handlePhotoUpload} />*/}
+                {/*</label>*/}
                 <button type="submit" disabled={loading}>{loading ? 'Загрузка...' : 'Сохранить изменения'}</button>
             </form>
         </div>

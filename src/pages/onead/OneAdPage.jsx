@@ -2,8 +2,8 @@ import React from 'react';
 import './OneAdPageStyle.css'
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {getAdR,getChatIdR} from "../../app/tempApi.js";
 import {useCheckUser} from "../../hooks/useCheckUser.js";
+import {getAdRequest, getChatIdRequest} from "../../app/api.js";
 
 const OneAdPage = () => {
     const { id } = useParams();
@@ -35,19 +35,17 @@ const OneAdPage = () => {
 
     const fetchAd = async () => {
         try{
-            const response = await getAdR(id,token);
+            const response = await getAdRequest(id,token);
             setAd(response.data);
         } catch (error){
             console.log(error);
-        } finally {
-            console.log(ad)
         }
     };
     const handleChat = async () => {
         setLoadingChat(true);
         try {
-            const chatId = await getChatIdR(id,token);
-            navigate(`/chat/${chatId.data.chat_id}`);
+            await getChatIdRequest(id,token);
+            navigate(`/chat/`);
         } catch (error) {
             console.error('Error fetching chat:', error);
         } finally {

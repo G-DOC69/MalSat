@@ -3,7 +3,7 @@ import './UserAdsPageStyle.css'
 import { useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import {useCheckUser} from "../../hooks/useCheckUser.js";
-import {getUserAdsR} from "../../app/tempApi.js";
+import {getUserAdsRequest} from "../../app/api.js";
 
 const UserAdsPage = () => {
     const [ads, setAds] = useState([]);
@@ -13,6 +13,7 @@ const UserAdsPage = () => {
     const navigate = useNavigate();
     const itemsPerPage = 7;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const token = localStorage.getItem("access_token")
 
     useCheckUser()
 
@@ -29,7 +30,7 @@ const UserAdsPage = () => {
     }
 
     const getThisUserAds = async () => {
-        const response = await getUserAdsR();
+        const response = await getUserAdsRequest(token);
         setAds(response.data);
         setFilteredAds(response.data.slice(0, itemsPerPage));
         setTotalItems(response.data.length);

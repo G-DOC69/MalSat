@@ -2,7 +2,7 @@
 import './AllAdsPageStyle.css'
 import { useState, useEffect } from "react";
 import {useNavigate} from "react-router-dom";
-import {getAllAdsR} from "../../app/tempApi.js";
+import {getAllAdsRequest} from "../../app/api.js";
 
 const AllAdsPage = () => {
     // variables
@@ -25,8 +25,24 @@ const AllAdsPage = () => {
 
     // UseEffects
     useEffect(() => {
-        getAllAds();
+        const fetchAds = async () => {
+            try {
+                const allAds = await getAllAdsRequest(); // Waits for data
+                setAds(allAds.data)
+            } catch (err) {
+                console.error("Error fetching ads:", err);
+            }
+        };
+
+        fetchAds();
     }, []);
+
+    useEffect(() => {
+        if (ads.length > 0) {
+            setFilteredAds(ads.slice(0, itemsPerPage));
+            setTotalItems(ads.length);
+        }
+    }, [ads]);
 
     useEffect(() => {
         applyFilters();
@@ -36,20 +52,12 @@ const AllAdsPage = () => {
         setPage(1);
     }, [filter]);
 
-    // Functions
-    const getAllAds = async () => {
-        const allAds = getAllAdsR();
-        setAds(await allAds);
-        setFilteredAds(allAds.slice(0, itemsPerPage));
-        setTotalItems(allAds.length);
-    };
-
     const applyFilters = () => {
         let filtered = ads.filter(ad =>
             (filter.animal ? ad.animal.toLowerCase() === filter.animal.toLowerCase() : true) &&
             (filter.breed ? ad.breed.toLowerCase() === filter.breed.toLowerCase() : true) &&
-            (filter.minAge ? checkMinAge(calculateAgeInMonths(ad.birthDate), filter.minAge, ads) : true) &&
-            (filter.maxAge ? checkMaxAge(calculateAgeInMonths(ad.birthDate), filter.maxAge, ads) : true) &&
+            (filter.minAge ? checkMinAge(calculateAgeInMonths(ad.age), filter.minAge, ads) : true) &&
+            (filter.maxAge ? checkMaxAge(calculateAgeInMonths(ad.age), filter.maxAge, ads) : true) &&
             (filter.region ? ad.region.toLowerCase() === filter.region.toLowerCase() : true) &&
             (filter.minPrice ? ad.price >= parseInt(filter.minPrice) : true) &&
             (filter.maxPrice ? ad.price <= parseInt(filter.maxPrice) : true)
@@ -92,7 +100,7 @@ const AllAdsPage = () => {
         return ageOrder.indexOf(adAge) <= ageOrder.indexOf(maxAge);
     };
 
-    const uniqueAges = (ads) => [...new Set(ads.map(ad => calculateAgeInMonths(ad.birthDate)))].sort((a, b) => a - b);
+    const uniqueAges = (ads) => [...new Set(ads.map(ad => calculateAgeInMonths(ad.age)))].sort((a, b) => a - b);
 
     const uniqueValues = (key) => [...new Set(ads.map(ad => ad[key]))];
 
@@ -179,7 +187,7 @@ const AllAdsPage = () => {
                     <div key={ad.id} onClick={() => navigate(`/ad/${ad.id}`)} style={{cursor: "pointer"}}>
                         <img src={ad.photoUrl} alt={ad.breed}/>
                         <h2>{ad.breed} ({ad.animal})</h2>
-                        <p>Возраст: {calculateAgeInMonths(ad.birthDate)} Месяцев ({calculateAgeInYears(calculateAgeInMonths(ad.birthDate))})</p>
+                        <p>Возраст: {calculateAgeInMonths(ad.age)} Месяцев ({calculateAgeInYears(calculateAgeInMonths(ad.age))})</p>
                         <p>Регион: {ad.region}</p>
                         <p>Цена: {ad.price} сом</p>
                     </div>
