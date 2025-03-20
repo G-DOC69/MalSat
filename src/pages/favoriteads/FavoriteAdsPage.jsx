@@ -40,7 +40,7 @@ const FavoriteAdsPage = () => {
 
     const getAllAds = async () => {
         const allAds = getFavoriteAdsR(token);
-        setAds(await allAds.data);
+        setAds(await allAds);
         setFilteredAds(allAds.slice(0, itemsPerPage));
         setTotalItems(allAds.length);
     };

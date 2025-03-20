@@ -31,9 +31,9 @@ const Routers = () => {
             <Route path="/login/forgot-password" element={<ForgotPage />} />
             <Route path="/user/" element={<ProfilePage />} />
             <Route path="/user/:id" element={<ProfilePage />} />
-            {/*<Route path="/user/change" element={<ChangeProfilePage />} />*/}
-            {/*<Route path="/chat/" element={<ChatPage />} />*/}
-            {/*<Route path="/chat/:id" element={<ChatPage />} />*/}
+            <Route path="/user/change" element={<ChangeProfilePage />} />
+            <Route path="/chat/" element={<ChatPage />} />
+            <Route path="/chat/:id" element={<ChatPage />} />
             <Route path="*" element={<ErrorPage />} />
         </Routes>
     );

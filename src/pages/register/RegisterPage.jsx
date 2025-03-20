@@ -3,6 +3,92 @@ import React, { useState } from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import countryPhoneCodes from '../../app/countryPhoneCodes.jsx';
 import {registerUserRequest} from "../../app/api.js";
+import styled from "styled-components"
+
+
+const RegisterContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f0f4f8;
+    flex-direction: column;
+`;
+
+const RegisterForm = styled.form`
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+`;
+
+const Title = styled.h2`
+    text-align: center;
+    color: #1e3a8a;
+`;
+
+const Input = styled.input`
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+
+    @media (max-width: 600px) {
+        padding: 10px;
+        font-size: 14px;
+    }
+`;
+
+const Select = styled.select`
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+`;
+
+const Button = styled.button`
+    background: #1e3a8a;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+
+    &:hover {
+        background: #3b82f6;
+    }
+`;
+
+const ErrorMessage = styled.p`
+    color: red;
+    font-size: 14px;
+    margin-top: -10px;
+    text-align: left;
+`;
+
+const RegisterLinks = styled.div`
+  margin-top: 12px;
+  text-align: center;
+
+  a {
+    color: #1e3a8a;
+    text-decoration: none;
+    font-size: 14px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -105,37 +191,42 @@ const RegisterPage = () => {
 
 
     return (
-        <div>
-            <h2>Регистрация</h2>
-            <form onSubmit={handleSubmit}>
-                <input type="text" name="username" placeholder="Имя пользователя" value={formData.username} onChange={handleChange} required />
-                <p>{errors.username}</p>
-                <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-                <p>{errors.email}</p>
-                <select onChange={(e) => setSelectedCode(e.target.value)}>
-                    {countryPhoneCodes.map(({id, country, code}) => (
+        <RegisterContainer>
+            <RegisterForm onSubmit={handleSubmit}>
+                <Title>Регистрация</Title>
+
+                <Input type="text" name="username" placeholder="Имя пользователя" value={formData.username} onChange={handleChange} required />
+                {errors.username && <ErrorMessage>{errors.username}</ErrorMessage>}
+
+                <Input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
+                {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
+
+                <Select onChange={(e) => setSelectedCode(e.target.value)}>
+                    {countryPhoneCodes.map(({ id, country, code }) => (
                         <option key={id} value={code}>
                             {country} ({code})
                         </option>
                     ))}
-                </select>
+                </Select>
 
-                <input
-                    type="text"
-                    value={formData.phoneNumber}
-                    onChange={handlePhoneChange}
-                    placeholder="Введите номер"
-                />
-                {phoneError && <p className="error">{phoneError}</p>}
-                <input type="password" name="password" placeholder="Пароль" value={formData.password} onChange={handleChange} required />
-                <p>{errors.password}</p>
-                <input type="password" name="confirmPassword" placeholder="Подтвердите пароль" value={formData.confirmPassword} onChange={handleChange} required />
-                <p>{errors.confirmPassword}</p>
-                <button type="submit">Зарегистрироваться</button>
-            </form>
-            {errorMessage && <div>{errorMessage}</div>}
-            <Link to="/login/sign-in">Уже Есть Аккаунт?</Link>
-        </div>
+                <Input type="text" value={formData.phoneNumber} onChange={handlePhoneChange} placeholder="Введите номер" />
+                {phoneError && <ErrorMessage>{phoneError}</ErrorMessage>}
+
+                <Input type="password" name="password" placeholder="Пароль" value={formData.password} onChange={handleChange} required />
+                {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
+
+                <Input type="password" name="confirmPassword" placeholder="Подтвердите пароль" value={formData.confirmPassword} onChange={handleChange} required />
+                {errors.confirmPassword && <ErrorMessage>{errors.confirmPassword}</ErrorMessage>}
+
+                <Button type="submit">Зарегистрироваться</Button>
+            </RegisterForm>
+
+            {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+
+            <RegisterLinks>
+                <Link to="/login/sign-in">Уже Есть Аккаунт?</Link>
+            </RegisterLinks>
+        </RegisterContainer>
     );
 };
 

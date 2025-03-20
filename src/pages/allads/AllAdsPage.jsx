@@ -3,6 +3,116 @@ import './AllAdsPageStyle.css'
 import { useState, useEffect } from "react";
 import {useNavigate} from "react-router-dom";
 import {getAllAdsRequest} from "../../app/api.js";
+import styled from "styled-components";
+
+const Container = styled.div`
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
+    display: flex;
+    flex-direction: column;
+    h1{
+        font-size: 5vw;
+        align-self: center;
+    }
+`;
+
+const Filters = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+`;
+
+const Label = styled.label`
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  font-size: 14px;
+`;
+
+const Select = styled.select`
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+`;
+
+const Input = styled.input`
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+`;
+
+const AdsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+`;
+
+const AdCard = styled.div`
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s;
+  text-align: center;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+`;
+
+const AdImage = styled.img`
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+`;
+
+const AdTitle = styled.h2`
+  font-size: 18px;
+  margin: 5px 0;
+`;
+
+const AdText = styled.p`
+  font-size: 14px;
+  color: #555;
+`;
+
+const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+`;
+
+const PageButton = styled.button`
+  background: #1e3a8a;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+
+  &:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background: #3b82f6;
+  }
+`;
 
 const AllAdsPage = () => {
     // variables
@@ -119,84 +229,92 @@ const AllAdsPage = () => {
 
     // Page
     return (
-        <div>
+        <Container>
             <h1>Все Объявления</h1>
-            <div>
-                <label>
+
+            {/* Фильтры */}
+            <Filters>
+                <Label>
                     Животное:
-                    <select value={filter.animal}
-                            onChange={e => setFilter({...filter, animal: e.target.value, breed: ""})}>
+                    <Select value={filter.animal} onChange={e => setFilter({...filter, animal: e.target.value, breed: ""})}>
                         <option value="">Любое</option>
                         {uniqueValues("animal").map(animal => (
                             <option key={animal} value={animal}>{animal}</option>
                         ))}
-                    </select>
-                </label>
-                <label>
+                    </Select>
+                </Label>
+
+                <Label>
                     Порода:
-                    <select value={filter.breed} disabled={!filter.animal}
-                            onChange={e => setFilter({...filter, breed: e.target.value})}>
+                    <Select value={filter.breed} disabled={!filter.animal} onChange={e => setFilter({...filter, breed: e.target.value})}>
                         <option value="">Любая</option>
                         {uniqueValues("breed").filter(breed => ads.find(ad => ad.animal === filter.animal && ad.breed === breed)).map(breed => (
                             <option key={breed} value={breed}>{breed}</option>
                         ))}
-                    </select>
-                </label>
-                <label>
+                    </Select>
+                </Label>
+
+                <Label>
                     Возраст от:
-                    <select value={filter.minAge}
-                        onChange={e => setFilter({...filter, minAge: Number(e.target.value)})}>
+                    <Select value={filter.minAge} onChange={e => setFilter({...filter, minAge: Number(e.target.value)})}>
                         <option value="">-</option>
                         {uniqueAges(ads).map(age => (
                             <option key={age} value={age}>{age} месяцев</option>
                         ))}
-                    </select>
-                </label>
-                <label>
+                    </Select>
+                </Label>
+
+                <Label>
                     до:
-                    <select value={filter.maxAge}
-                        onChange={e => setFilter({...filter, maxAge: Number(e.target.value)})}>
+                    <Select value={filter.maxAge} onChange={e => setFilter({...filter, maxAge: Number(e.target.value)})}>
                         <option value="">-</option>
                         {uniqueAges(ads).map(age => (
                             <option key={age} value={age}>{age} месяцев</option>
                         ))}
-                    </select>
-                </label>
-                <label>
+                    </Select>
+                </Label>
+
+                <Label>
                     Регион:
-                    <select value={filter.region} onChange={e => setFilter({...filter, region: e.target.value})}>
+                    <Select value={filter.region} onChange={e => setFilter({...filter, region: e.target.value})}>
                         <option value="">Все</option>
                         {uniqueValues("region").map(region => (
                             <option key={region} value={region}>{region}</option>
                         ))}
-                    </select>
-                </label>
-                <label>
+                    </Select>
+                </Label>
+
+                <Label>
                     Цена от:
-                    <input type="number" value={filter.minPrice}
-                           onChange={e => setFilter({...filter, minPrice: e.target.value})}/>
-                </label>
-                <label>
+                    <Input type="number" value={filter.minPrice} onChange={e => setFilter({...filter, minPrice: e.target.value})} />
+                </Label>
+
+                <Label>
                     до:
-                    <input type="number" value={filter.maxPrice}
-                           onChange={e => setFilter({...filter, maxPrice: e.target.value})}/>
-                </label>
-            </div>
-            <div>
+                    <Input type="number" value={filter.maxPrice} onChange={e => setFilter({...filter, maxPrice: e.target.value})} />
+                </Label>
+            </Filters>
+
+            {/* Карточки объявлений */}
+            <AdsGrid>
                 {filteredAds.map((ad) => (
-                    <div key={ad.id} onClick={() => navigate(`/ad/${ad.id}`)} style={{cursor: "pointer"}}>
-                        <img src={ad.photoUrl} alt={ad.breed}/>
-                        <h2>{ad.breed} ({ad.animal})</h2>
-                        <p>Возраст: {calculateAgeInMonths(ad.age)} Месяцев ({calculateAgeInYears(calculateAgeInMonths(ad.age))})</p>
-                        <p>Регион: {ad.region}</p>
-                        <p>Цена: {ad.price} сом</p>
-                    </div>
+                    <AdCard key={ad.id} onClick={() => navigate(`/ad/${ad.id}`)}>
+                        <AdImage src={ad.photoUrl} alt={ad.breed} />
+                        <AdTitle>{ad.breed} ({ad.animal})</AdTitle>
+                        <AdText>Возраст: {calculateAgeInMonths(ad.age)} месяцев ({calculateAgeInYears(calculateAgeInMonths(ad.age))} лет)</AdText>
+                        <AdText>Регион: {ad.region}</AdText>
+                        <AdText><strong>{ad.price} сом</strong></AdText>
+                    </AdCard>
                 ))}
-            </div>
-            <button onClick={handlePrevPage} disabled={page === 1}>Назад</button>
-            <p>{page}/{totalPages} </p>
-            <button onClick={handleNextPage} disabled={page * itemsPerPage >= totalItems}>Вперед</button>
-        </div>
+            </AdsGrid>
+
+            {/* Пагинация */}
+            <Pagination>
+                <PageButton onClick={handlePrevPage} disabled={page === 1}>← Назад</PageButton>
+                <p>{page} / {totalPages}</p>
+                <PageButton onClick={handleNextPage} disabled={page * itemsPerPage >= totalItems}>Вперед →</PageButton>
+            </Pagination>
+        </Container>
     );
 };
 export default AllAdsPage;

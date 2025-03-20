@@ -4,7 +4,84 @@ import { useNavigate } from 'react-router-dom';
 import { getAnimalsListR} from "../../app/tempApi.js";
 import {useCheckUser} from "../../hooks/useCheckUser.js";
 import {postAdRequest} from "../../app/api.js";
+import styled from "styled-components";
 
+const Container = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  max-width: 800px;
+  margin: auto 0;
+`;
+
+const FormSection = styled.div`
+  flex: 1;
+  min-width: 300px;
+`;
+
+const Title = styled.h2`
+  font-size: 24px;
+  color: #1e3a8a;
+`;
+
+const Label = styled.label`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+  font-weight: bold;
+`;
+
+const Input = styled.input`
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+`;
+
+const TextArea = styled.textarea`
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  min-height: 80px;
+`;
+
+const Button = styled.button`
+  background: #1e3a8a;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+  width: 100%;
+
+  &:hover {
+    background: #3b82f6;
+  }
+`;
+
+const PhotoSection = styled.div`
+  flex: 1;
+  min-width: 300px;
+  text-align: center;
+`;
+
+const PhotoPreview = styled.div`
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
+`;
+
+const Photo = styled.img`
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+`;
 
 const PostAdPage = () => {
     const navigate = useNavigate();
@@ -20,6 +97,7 @@ const PostAdPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const token = localStorage.getItem("access_token")
+    const [previewPhotos,setPreviewPhotos]=useState([]);
 
     useCheckUser()
 
@@ -49,6 +127,13 @@ const PostAdPage = () => {
         setFormData((prev) => ({ ...prev, photos: [...prev.photos, ...files] }));
     };
 
+    const onPhotoChange = (event) => {
+        const files = Array.from(event.target.files);
+        const previews = files.map(file => URL.createObjectURL(file));
+        setPreviewPhotos(previews);
+        handlePhotoUpload(event);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -65,41 +150,62 @@ const PostAdPage = () => {
         }
     };
     return (
-        <div>
-            <h2>Подать объявление</h2>
-            {error && <div className="error-message">{error}</div>}
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Животное:
-                    <select name="animal" value={formData.animal} onChange={handleChange} required>
-                        {animals.map((animal) => (
-                            <option key={animal} value={animal}>{animal}</option>
-                        ))}
-                    </select>
-                </label>
-                <label>
-                    Порода:
-                    <input name="breed" value={formData.breed} onChange={handleChange} required />
-                </label>
-                <label>
-                    Возраст:
-                    <input type="date" name="age" value={formData.age} onChange={handleChange} required />
-                </label>
-                <label>
-                    Цена (KGS):
-                    <input type="number" name="price" value={formData.price} onChange={handleChange} required />
-                </label>
-                <label>
-                    Описание:
-                    <textarea name="description" value={formData.description} onChange={handleChange} maxLength="2000" required />
-                </label>
-                <label>
-                    Фото (макс. 10):
-                    <input type="file" multiple accept="image/*" onChange={handlePhotoUpload} />
-                </label>
-                <button type="submit" disabled={loading}>{loading ? 'Загрузка...' : 'Сохранить изменения'}</button>
-            </form>
-        </div>
+        <Container>
+            {/* Форма объявления */}
+            <FormSection>
+                <Title>Подать объявление</Title>
+                {error && <div className="error-message">{error}</div>}
+                <form onSubmit={handleSubmit}>
+                    <Label>
+                        Животное:
+                        <select name="animal" value={formData.animal} onChange={handleChange} required>
+                            {animals.map((animal) => (
+                                <option key={animal} value={animal}>{animal}</option>
+                            ))}
+                        </select>
+                    </Label>
+
+                    <Label>
+                        Порода:
+                        <Input name="breed" value={formData.breed} onChange={handleChange} required />
+                    </Label>
+
+                    <Label>
+                        Возраст:
+                        <Input type="date" name="age" value={formData.age} onChange={handleChange} required />
+                    </Label>
+
+                    <Label>
+                        Цена (KGS):
+                        <Input type="number" name="price" value={formData.price} onChange={handleChange} required />
+                    </Label>
+
+                    <Label>
+                        Описание:
+                        <TextArea name="description" value={formData.description} onChange={handleChange} maxLength="2000" required />
+                    </Label>
+
+                    <Label>
+                        Фото (макс. 10):
+                        <Input type="file" multiple accept="image/*" onChange={onPhotoChange} />
+                    </Label>
+
+                    <Button type="submit" disabled={loading}>{loading ? 'Загрузка...' : 'Сохранить изменения'}</Button>
+                </form>
+            </FormSection>
+
+            {/* Превью загруженных фото */}
+            <PhotoSection>
+                <h3>Предпросмотр фото</h3>
+                <PhotoPreview>
+                    {previewPhotos.length > 0 ? (
+                        previewPhotos.map((src, index) => <Photo key={index} src={src} alt="Preview" />)
+                    ) : (
+                        <p>Фото еще не загружены</p>
+                    )}
+                </PhotoPreview>
+            </PhotoSection>
+        </Container>
     );
 };
 

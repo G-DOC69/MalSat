@@ -4,6 +4,87 @@ import { useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import {useCheckUser} from "../../hooks/useCheckUser.js";
 import {getUserAdsRequest} from "../../app/api.js";
+import styled    from "styled-components";
+
+const Container = styled.div`
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+`;
+
+const Title = styled.h1`
+  text-align: center;
+  margin-bottom: 20px;
+`;
+
+const AdsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+`;
+
+const AdCard = styled.div`
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  background: white;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: scale(1.03);
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const AdImage = styled.img`
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+`;
+
+const AdInfo = styled.div`
+  padding: 10px;
+`;
+
+const AdTitle = styled.h2`
+  font-size: 16px;
+  margin-bottom: 5px;
+`;
+
+const AdText = styled.p`
+  font-size: 14px;
+  color: #555;
+`;
+
+const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+`;
+
+const PageButton = styled.button`
+  background: ${({ disabled }) => (disabled ? "#ddd" : "#1e3a8a")};
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  transition: background 0.3s;
+  margin: 0 5px;
+
+  &:hover:not(:disabled) {
+    background: #3b82f6;
+  }
+`;
+
+const PageNumber = styled.p`
+  margin: 0 10px;
+  font-size: 16px;
+`;
+
 
 const UserAdsPage = () => {
     const [ads, setAds] = useState([]);
@@ -72,25 +153,31 @@ const UserAdsPage = () => {
         }
     };
     return (
-        <div>
-            <div>
-                <h1>Мои Обьявления</h1>
-                <div>
-                    {filteredAds.map((ad) => (
-                        <div key={ad.id} onClick={() => navigate(`/ad/${ad.id}`)} style={{cursor: "pointer"}}>
-                            <img src={ad.photoUrl} alt={ad.breed}/>
-                            <h2>{ad.breed} ({ad.animal})</h2>
-                            <p>Возраст: {calculateAgeInMonths(ad.birthDate)} ({calculateAgeInYears(calculateAgeInMonths(ad.birthDate))})</p>
-                            <p>Регион Продажи: {ad.region}</p>
-                            <p>Цена: {ad.price} som</p>
-                        </div>
-                    ))}
-                </div>
-                <button onClick={handlePrevPage} disabled={page === 1}>Назад</button>
-                <p>{page}/{totalPages} </p>
-                <button onClick={handleNextPage} disabled={page * itemsPerPage >= totalItems}>Вперед</button>
-            </div>
-        </div>
+        <Container>
+            <Title>Мои Объявления</Title>
+
+            {/* Сетка с объявлениями */}
+            <AdsGrid>
+                {filteredAds.map((ad) => (
+                    <AdCard key={ad.id} onClick={() => navigate(`/ad/${ad.id}`)}>
+                        <AdImage src={ad.photoUrl} alt={ad.breed} />
+                        <AdInfo>
+                            <AdTitle>{ad.breed} ({ad.animal})</AdTitle>
+                            <AdText>Возраст: {calculateAgeInMonths(ad.birthDate)} мес ({calculateAgeInYears(calculateAgeInMonths(ad.birthDate))})</AdText>
+                            <AdText>Регион: {ad.region}</AdText>
+                            <AdText>Цена: {ad.price} сом</AdText>
+                        </AdInfo>
+                    </AdCard>
+                ))}
+            </AdsGrid>
+
+            {/* Пагинация */}
+            <Pagination>
+                <PageButton onClick={handlePrevPage} disabled={page === 1}>Назад</PageButton>
+                <PageNumber>{page}/{totalPages}</PageNumber>
+                <PageButton onClick={handleNextPage} disabled={page * itemsPerPage >= totalItems}>Вперед</PageButton>
+            </Pagination>
+        </Container>
     );
 };
 

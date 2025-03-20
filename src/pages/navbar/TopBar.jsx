@@ -3,7 +3,88 @@ import './TopBarStyle.css';
 import {Link, useNavigate} from 'react-router-dom';
 import { UserContext } from "../../App.jsx";
 import {getNewMessagesCountR, getUserNotificationsR} from "../../app/tempApi.js";
-import {getUserNotificationsRequest} from "../../app/api.js";
+import styled from "styled-components";
+import { FaRegComments, FaBell, FaHeart, FaUser, FaListAlt } from "react-icons/fa"; // Icons
+
+const Navbar = styled.nav`
+  width: 100%;
+  height: 60px;
+  background-color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  color: white;
+  z-index: 1000;
+  justify-content: space-between;
+
+  @media (max-width: 600px) {
+    padding: 0 10px;
+  }
+`;
+
+const SiteTitle = styled.h1`
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  flex-grow: 1;
+  text-align: center;
+
+  @media (max-width: 600px) {
+    text-align: left;
+    font-size: 20px;
+  }
+`;
+
+const NavList = styled.ul`
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    gap: 10px;
+  }
+`;
+
+const NavButton = styled.button`
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  @media (max-width: 600px) {
+    font-size: 14px;
+  }
+`;
+
+const IconButton = styled.button`
+  background: none;
+  border: none;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+const NotificationsWindow = styled.div`
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  background: white;
+  color: black;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 200px;
+`;
 
 const Topbar = () => {
     const [user,setUser] = useContext(UserContext);
@@ -43,79 +124,80 @@ const Topbar = () => {
         }
     }, [user]);
 
-    const userChecker = ()=>{
-        if (user){
-            setUser(false)
-        }else{
-            setUser(true)}
-    }
+    useEffect(() => {
+            const userChecker = () => {
+                if (user) {
+                    setUser(false)
+                } else {
+                    setUser(true)
+                }
+            }
+            userChecker();
+        }, []);
 
     return (
-        <nav>
-            <h1 onClick={() => navigate('/')}>MalSat.kg</h1>
-            <ul>
+        <Navbar>
+            <SiteTitle onClick={() => navigate("/")}>MalSat.kg</SiteTitle>
+            <NavList>
                 {user ? (
                     <>
                         <li>
-                            <button onClick={() => navigate('/chat')}>
-                                Сообщения {newMessages > 0 && `(${newMessages > 99 ? '99+' : newMessages})`}
-                            </button>
+                            <IconButton onClick={() => navigate("/chat")}>
+                                <FaRegComments />
+                                {newMessages > 0 && `(${newMessages > 99 ? "99+" : newMessages})`}
+                            </IconButton>
                         </li>
                         <li>
-                            <button onClick={() => setIsNotificationOpen(!isNotificationOpen)}>
-                                Уведомления
-                            </button>
+                            <IconButton onClick={() => setIsNotificationOpen(!isNotificationOpen)}>
+                                <FaBell />
+                            </IconButton>
                             {isNotificationOpen && (
-                                <div className="notifications-window">
+                                <NotificationsWindow>
                                     {notifications.length === 0 ? (
                                         <p>Нет новых уведомлений.</p>
                                     ) : (
                                         <ul>
                                             {notifications.map((notification, index) => (
                                                 <li key={index}>
-                                                    {notification.message}{' '}
+                                                    {notification.message}{" "}
                                                     {notification.ad && (
-                                                        <Link to={notification.link}>
-                                                            {notification.ad}
-                                                        </Link>
+                                                        <Link to={notification.link}>{notification.ad}</Link>
                                                     )}
                                                 </li>
                                             ))}
                                         </ul>
                                     )}
-                                </div>
+                                </NotificationsWindow>
                             )}
                         </li>
                         <li>
-                            <button onClick={() => navigate('/ad/favorites')}>Избранное</button>
+                            <IconButton onClick={() => navigate("/ad/favorites")}>
+                                <FaHeart />
+                            </IconButton>
                         </li>
                         <li>
-                            <button onClick={() => navigate('/ad/my-ads')}>Мои объявления</button>
+                            <IconButton onClick={() => navigate("/ad/my-ads")}>
+                                <FaListAlt />
+                            </IconButton>
                         </li>
                         <li>
-                            <button onClick={() => navigate('/user')}>Профиль</button>
+                            <IconButton onClick={() => navigate("/user")}>
+                                <FaUser />
+                            </IconButton>
                         </li>
                     </>
                 ) : (
                     <>
                         <li>
-                            <button onClick={() => navigate('/login/sign-in')}>Войти</button>
+                            <NavButton onClick={() => navigate("/login/sign-in")}>Войти</NavButton>
                         </li>
                         <li>
-                            <button onClick={() => navigate('/login/register')}>Регистрация</button>
+                            <NavButton onClick={() => navigate("/login/register")}>Регистрация</NavButton>
                         </li>
                     </>
                 )}
-            </ul>
-
-
-            <div onClick={userChecker}
-                // style={{background:"red", width:"200px",height:"200px"}}
-            >
-                USERCHECKER
-            </div>
-
-        </nav>
+            </NavList>
+        </Navbar>
     );
 };
 

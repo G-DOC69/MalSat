@@ -4,6 +4,91 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {useCheckUser} from "../../hooks/useCheckUser.js";
 import {getAdRequest, getChatIdRequest} from "../../app/api.js";
+import styled from "styled-components";
+
+const Container = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  max-width: 900px;
+  margin: auto 0;
+`;
+
+const InfoSection = styled.div`
+  flex: 1;
+  min-width: 300px;
+`;
+
+const Title = styled.h1`
+  font-size: 24px;
+  color: #1e3a8a;
+`;
+
+const List = styled.ul`
+  list-style: none;
+  padding: 0;
+  
+  li {
+    padding: 5px 0;
+    font-size: 16px;
+  }
+`;
+
+const ImageSection = styled.div`
+  flex: 1;
+  min-width: 300px;
+  text-align: center;
+  position: relative;
+`;
+
+const Image = styled.img`
+  width: 100%;
+  max-width: 350px;
+  border-radius: 8px;
+`;
+
+const Button = styled.button`
+  background: #1e3a8a;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+  width: 100%;
+
+  &:hover {
+    background: #3b82f6;
+  }
+`;
+
+const SellerSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 10px;
+  background: #f3f4f6;
+  border-radius: 8px;
+`;
+
+const SellerPhoto = styled.img`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+`;
+
+const SellerName = styled.p`
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
 
 const OneAdPage = () => {
     const { id } = useParams();
@@ -77,41 +162,49 @@ const OneAdPage = () => {
     }
 
     return (
-        <div>
-            {ad.breed && ad.animal && <h1>Купить {ad.breed} ({ad.animal})</h1>}
-            {ad.photos.length > 0 && (
-                <div>
-                    <button
-                        onClick={() => setCurrentPhotoIndex((prev) => (prev > 0 ? prev - 1 : ad.photos.length - 1))}>
-                        ◀
-                    </button>
-                    <img src={ad.photos[currentPhotoIndex]} alt="Ad" style={{maxWidth: "300px"}}/>
-                    <button
-                        onClick={() => setCurrentPhotoIndex((prev) => (prev < ad.photos.length - 1 ? prev + 1 : 0))}>
-                        ▶
-                    </button>
-                </div>
-            )}
-            <ul>
-                {ad.region && <li>Регион Продажи: {ad.region}</li>}
-                {ad.breed && <li>Порода: {ad.breed}</li>}
-                {ad.age && <li>Возраст: {calculateAgeInMonths(ad.age)} месяцев ({calculateAgeInYears(calculateAgeInMonths(ad.age))} лет)</li>}
-                {ad.description && <li>Описание: {ad.description}</li>}
-            </ul>
+        <Container>
+            {/* Информация о товаре */}
+            <InfoSection>
+                {ad.breed && ad.animal && <Title>Купить {ad.breed} ({ad.animal})</Title>}
+                <List>
+                    {ad.region && <li>📍 Регион Продажи: {ad.region}</li>}
+                    {ad.breed && <li>🐾 Порода: {ad.breed}</li>}
+                    {ad.age && <li>🕑 Возраст: {calculateAgeInMonths(ad.age)} месяцев ({calculateAgeInYears(calculateAgeInMonths(ad.age))})</li>}
+                    {ad.description && <li>📜 Описание: {ad.description}</li>}
+                </List>
+            </InfoSection>
+
+            {/* Фотографии */}
+            <ImageSection>
+                {ad.photos.length > 0 && (
+                    <>
+                        <button onClick={() => setCurrentPhotoIndex((prev) => (prev > 0 ? prev - 1 : ad.photos.length - 1))}>
+                            ◀
+                        </button>
+                        <Image src={ad.photos[currentPhotoIndex]} alt="Ad" />
+                        <button onClick={() => setCurrentPhotoIndex((prev) => (prev < ad.photos.length - 1 ? prev + 1 : 0))}>
+                            ▶
+                        </button>
+                    </>
+                )}
+            </ImageSection>
+
+            {/* Продавец */}
             {ad.seller.id && (
-                <div>
-                    <h2>Seller Information</h2>
-                    <div onClick={() => navigate(`/user/${ad.seller.id}`)} style={{cursor: "pointer"}}>
-                        {ad.seller.profilePic && <img src={ad.seller.profilePic} alt={ad.seller.name} style={{width: "50px", borderRadius: "50%"}}/>}
-                        <p>{ad.seller.name}</p>
+                <SellerSection onClick={() => navigate(`/user/${ad.seller.id}`)}>
+                    {ad.seller.profilePic && <SellerPhoto src={ad.seller.profilePic} alt={ad.seller.name} />}
+                    <div>
+                        <SellerName>{ad.seller.name}</SellerName>
+                        {ad.seller.phone && <p>📞 {ad.seller.phone}</p>}
                     </div>
-                    {ad.seller.phone && <p>Номер Телефона: {ad.seller.phone}</p>}
-                </div>
+                </SellerSection>
             )}
-            <button onClick={handleChat} disabled={loadingChat}>
-                {loadingChat ? 'Загрузка...' : 'Чат с продавцом'}
-            </button>
-        </div>
+
+            {/* Кнопка чата */}
+            <Button onClick={handleChat} disabled={loadingChat}>
+                {loadingChat ? 'Загрузка...' : '💬 Чат с продавцом'}
+            </Button>
+        </Container>
     );
 };
 
