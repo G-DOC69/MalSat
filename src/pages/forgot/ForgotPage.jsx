@@ -1,7 +1,7 @@
-import './ForgotPageStyle.css'
+import './ForgotPageStyle.css';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {sendPasswordResetR} from "../../app/tempApi.js";
+import { sendPasswordResetRequest } from "../../app/api.js";
 
 const ForgotPage = () => {
     const [email, setEmail] = useState('');
@@ -17,16 +17,15 @@ const ForgotPage = () => {
         setError(null);
 
         try {
-            const response = await sendPasswordResetR(email);
-            if (response.status ===200 || response.status === 201) {
+            const response = await sendPasswordResetRequest({ email });
+            if (response.status === 200 || response.status === 201) {
                 setMessage('Ссылка для восстановления пароля отправлена на вашу почту.');
                 setTimeout(() => navigate('/'), 3000);
             } else {
-                setError(response.message || 'Ошибка при отправке запроса.');
+                setError('Ошибка при отправке запроса.');
             }
-            // eslint-disable-next-line no-unused-vars
         } catch (err) {
-            setError('Нет ответа от сервера.');
+            setError(err.response?.data?.message || 'Нет ответа от сервера.');
         } finally {
             setLoading(false);
         }

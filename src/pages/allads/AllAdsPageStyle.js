@@ -1,0 +1,13 @@
+import styled from "styled-components";
+export const Container = styled.div`padding: 20px; max-width: 1200px; margin: auto; display: flex; flex-direction: column; h1{ font-size: 5vw; align-self: center;}`;
+export const Filters = styled.div`display: flex; flex-wrap: wrap; gap: 15px; padding: 15px; background: #f8fafc; border-radius: 10px; margin-bottom: 20px;`;
+export const Label = styled.label`display: flex; flex-direction: column; font-weight: bold; font-size: 14px;`;
+export const Select = styled.select`padding: 5px; border: 1px solid #ccc; border-radius: 5px;`;
+export const Input = styled.input`padding: 5px; border: 1px solid #ccc; border-radius: 5px;`;
+export const AdsGrid = styled.div`display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;`;
+export const AdCardStyled = styled.div`background: white; padding: 10px; border-radius: 10px; cursor: pointer;`;
+export const AdImage = styled.img`width: 100%; height: 180px; object-fit: cover; border-radius: 8px;`;
+export const AdTitle = styled.h2`font-size: 18px; margin: 5px 0;`;
+export const AdText = styled.p`font-size: 14px; color: #555;`;
+export const PaginationStyled = styled.div`display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px;`;
+export const PageButton = styled.button`background: #1e3a8a; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; &:disabled { background: #94a3b8;}`;

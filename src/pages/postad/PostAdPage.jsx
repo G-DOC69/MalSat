@@ -1,86 +1,84 @@
-import './PostAdPageStyle.css'
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAnimalsListR} from "../../app/tempApi.js";
-import {useCheckUser} from "../../hooks/useCheckUser.js";
-import {postAdRequest} from "../../app/api.js";
+import { getAnimalsListRequest, postAdRequest } from "../../app/api.js";
+import { useCheckUser } from "../../hooks/useCheckUser.js";
 import styled from "styled-components";
 
 const Container = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  padding: 20px;
-  max-width: 800px;
-  margin: auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    max-width: 800px;
+    margin: auto 0;
 `;
 
 const FormSection = styled.div`
-  flex: 1;
-  min-width: 300px;
+    flex: 1;
+    min-width: 300px;
 `;
 
 const Title = styled.h2`
-  font-size: 24px;
-  color: #1e3a8a;
+    font-size: 24px;
+    color: #1e3a8a;
 `;
 
 const Label = styled.label`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 10px;
-  font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    font-weight: bold;
 `;
 
 const Input = styled.input`
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
 `;
 
 const TextArea = styled.textarea`
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-  min-height: 80px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    min-height: 80px;
 `;
 
 const Button = styled.button`
-  background: #1e3a8a;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s;
-  width: 100%;
+    background: #1e3a8a;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    width: 100%;
 
-  &:hover {
-    background: #3b82f6;
-  }
+    &:hover {
+        background: #3b82f6;
+    }
 `;
 
 const PhotoSection = styled.div`
-  flex: 1;
-  min-width: 300px;
-  text-align: center;
+    flex: 1;
+    min-width: 300px;
+    text-align: center;
 `;
 
 const PhotoPreview = styled.div`
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-  justify-content: center;
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: center;
 `;
 
 const Photo = styled.img`
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 8px;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
 `;
 
 const PostAdPage = () => {
@@ -96,21 +94,21 @@ const PostAdPage = () => {
     const [animals, setAnimals] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const token = localStorage.getItem("access_token")
-    const [previewPhotos,setPreviewPhotos]=useState([]);
+    const token = localStorage.getItem("access_token");
+    const [previewPhotos, setPreviewPhotos] = useState([]);
 
-    useCheckUser()
+    useCheckUser();
 
     useEffect(() => {
-        const fetchAdEssentials = async () => {
+        const fetchAnimals = async () => {
             try {
-                let animalsList = await getAnimalsListR(token);
-                setAnimals(animalsList.data);
+                const response = await getAnimalsListRequest(token);
+                setAnimals(response.data);
             } catch (err) {
-                setError(err||'Ошибка загрузки объявления.');
+                setError("Ошибка при загрузке списка животных");
             }
         };
-        fetchAdEssentials();
+        fetchAnimals();
     }, []);
 
     const handleChange = (e) => {
@@ -124,41 +122,51 @@ const PostAdPage = () => {
             setError('Максимум 10 фото!');
             return;
         }
-        setFormData((prev) => ({ ...prev, photos: [...prev.photos, ...files] }));
-    };
-
-    const onPhotoChange = (event) => {
-        const files = Array.from(event.target.files);
         const previews = files.map(file => URL.createObjectURL(file));
-        setPreviewPhotos(previews);
-        handlePhotoUpload(event);
+        setPreviewPhotos((prev) => [...prev, ...previews]);
+        setFormData((prev) => ({ ...prev, photos: [...prev.photos, ...files] }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+
         try {
-            const response = await postAdRequest(token, formData);
+            const multipartForm = new FormData();
+            multipartForm.append("formData", new Blob(
+                [JSON.stringify({
+                    animal: formData.animal,
+                    breed: formData.breed,
+                    age: formData.age,
+                    price: formData.price,
+                    description: formData.description
+                })],
+                { type: "application/json" }
+            ));
+            formData.photos.forEach((photo) => multipartForm.append("photos", photo));
+
+            const response = await postAdRequest(token, multipartForm);
             if (response.status === 200 || response.status === 201) {
                 navigate('/ad/my-ads');
             }
         } catch (err) {
-            setError(err||'Ошибка обновления объявления.');
+            setError(err?.message || 'Ошибка отправки данных');
         } finally {
             setLoading(false);
         }
     };
+
     return (
         <Container>
-            {/* Форма объявления */}
             <FormSection>
                 <Title>Подать объявление</Title>
-                {error && <div className="error-message">{error}</div>}
+                {error && <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>}
                 <form onSubmit={handleSubmit}>
                     <Label>
                         Животное:
                         <select name="animal" value={formData.animal} onChange={handleChange} required>
+                            <option value="">Выберите</option>
                             {animals.map((animal) => (
                                 <option key={animal} value={animal}>{animal}</option>
                             ))}
@@ -187,27 +195,27 @@ const PostAdPage = () => {
 
                     <Label>
                         Фото (макс. 10):
-                        <Input type="file" multiple accept="image/*" onChange={onPhotoChange} />
+                        <Input type="file" multiple accept="image/*" onChange={handlePhotoUpload} />
                     </Label>
 
-                    <Button type="submit" disabled={loading}>{loading ? 'Загрузка...' : 'Сохранить изменения'}</Button>
+                    <Button type="submit" disabled={loading}>{loading ? "Загрузка..." : "Опубликовать"}</Button>
                 </form>
             </FormSection>
 
-            {/* Превью загруженных фото */}
             <PhotoSection>
                 <h3>Предпросмотр фото</h3>
                 <PhotoPreview>
                     {previewPhotos.length > 0 ? (
-                        previewPhotos.map((src, index) => <Photo key={index} src={src} alt="Preview" />)
+                        previewPhotos.map((src, index) => (
+                            <Photo key={index} src={src} alt="Preview" />
+                        ))
                     ) : (
-                        <p>Фото еще не загружены</p>
+                        <p>Фото не выбраны</p>
                     )}
                 </PhotoPreview>
             </PhotoSection>
         </Container>
     );
 };
-
 
 export default PostAdPage;

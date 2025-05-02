@@ -85,7 +85,6 @@ const PageNumber = styled.p`
   font-size: 16px;
 `;
 
-
 const UserAdsPage = () => {
     const [ads, setAds] = useState([]);
     const [filteredAds, setFilteredAds] = useState([]);
@@ -94,27 +93,32 @@ const UserAdsPage = () => {
     const navigate = useNavigate();
     const itemsPerPage = 7;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const token = localStorage.getItem("access_token")
+    const token = localStorage.getItem("access_token");
 
-    useCheckUser()
+    useCheckUser();
 
     useEffect(() => {
         getThisUserAds();
     }, []);
+
     useEffect(() => {
-        checkAds();
+        updateFilteredAds();
     }, [page, ads]);
 
-    const checkAds = () => {
+    const updateFilteredAds = () => {
         const startIndex = (page - 1) * itemsPerPage;
         setFilteredAds(ads.slice(startIndex, startIndex + itemsPerPage));
-    }
+    };
 
     const getThisUserAds = async () => {
-        const response = await getUserAdsRequest(token);
-        setAds(response.data);
-        setFilteredAds(response.data.slice(0, itemsPerPage));
-        setTotalItems(response.data.length);
+        try {
+            const response = await getUserAdsRequest(token);
+            setAds(response.data);
+            setFilteredAds(response.data.slice(0, itemsPerPage));
+            setTotalItems(response.data.length);
+        } catch (err) {
+            console.error('Ошибка загрузки объявлений:', err);
+        }
     };
 
     const calculateAgeInMonths = (birthDate) => {
@@ -124,21 +128,13 @@ const UserAdsPage = () => {
     };
 
     const calculateAgeInYears = (months) => {
-        switch (Math.floor(months/12)){
-            case 0:
-                return (Math.floor(months/12)+' лет');
-            case 1:
-                return (Math.floor(months/12)+' год')
-            case 2:
-                return (Math.floor(months/12)+' года')
-            case 3:
-                return (Math.floor(months/12)+' года')
-            case 4:
-                return (Math.floor(months/12)+' года')
-            default:
-                return (Math.floor(months/12)+' лет')
+        switch (Math.floor(months / 12)) {
+            case 0: return `${months} мес`;
+            case 1: return '1 год';
+            case 2: case 3: case 4: return `${Math.floor(months / 12)} года`;
+            default: return `${Math.floor(months / 12)} лет`;
         }
-    }
+    };
 
     const handleNextPage = () => {
         const nextPage = page + 1;
@@ -152,18 +148,19 @@ const UserAdsPage = () => {
             setPage(page - 1);
         }
     };
+
     return (
         <Container>
             <Title>Мои Объявления</Title>
-
-            {/* Сетка с объявлениями */}
             <AdsGrid>
                 {filteredAds.map((ad) => (
                     <AdCard key={ad.id} onClick={() => navigate(`/ad/${ad.id}`)}>
                         <AdImage src={ad.photoUrl} alt={ad.breed} />
                         <AdInfo>
                             <AdTitle>{ad.breed} ({ad.animal})</AdTitle>
-                            <AdText>Возраст: {calculateAgeInMonths(ad.birthDate)} мес ({calculateAgeInYears(calculateAgeInMonths(ad.birthDate))})</AdText>
+                            <AdText>
+                                Возраст: {calculateAgeInMonths(ad.age)} мес ({calculateAgeInYears(calculateAgeInMonths(ad.age))})
+                            </AdText>
                             <AdText>Регион: {ad.region}</AdText>
                             <AdText>Цена: {ad.price} сом</AdText>
                         </AdInfo>
@@ -171,7 +168,6 @@ const UserAdsPage = () => {
                 ))}
             </AdsGrid>
 
-            {/* Пагинация */}
             <Pagination>
                 <PageButton onClick={handlePrevPage} disabled={page === 1}>Назад</PageButton>
                 <PageNumber>{page}/{totalPages}</PageNumber>

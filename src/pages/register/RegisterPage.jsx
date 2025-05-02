@@ -107,88 +107,73 @@ const RegisterPage = () => {
 
     const handlePhoneChange = (e) => {
         const number = e.target.value;
-        setFormData(prevFormData => ({
-            ...prevFormData,
-            phoneNumber: number
+        setFormData(prev => ({
+            ...prev,
+            phoneNumber: number,
+            phoneCode: selectedCode
         }));
         setPhoneError(validatePhoneNumber(selectedCode, number));
     };
 
-    const validateUsername = (username) => {
-        return /^[A-Za-zА-Яа-яЁё0-9]{1,20}$/.test(username);
-    };
+    const validateUsername = (username) => /^[A-Za-zА-Яа-яЁё0-9]{1,20}$/.test(username);
+    const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const validatePassword = (password) => /^[A-Za-z\d!?*()]{8,20}$/.test(password);
 
-    const validateEmail = (email) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    };
-    const validatePhoneNumber = (selectedCode, phoneNumber) => {
-        const country = countryPhoneCodes.find(c => c.code === selectedCode);
-        if (!country) {
-            return "Выберите страну";
-        }
-        const cleanedNumber = phoneNumber.replace(/\D/g, "");
-        if (cleanedNumber.length !== country.length) {
-            return `Номер должен содержать ${country.length} цифр`;
-        }
+    const validatePhoneNumber = (code, phoneNumber) => {
+        const country = countryPhoneCodes.find(c => c.code === code);
+        if (!country) return "Выберите страну";
+        const cleaned = phoneNumber.replace(/\D/g, "");
+        if (cleaned.length !== country.length) return `Номер должен содержать ${country.length} цифр`;
         return "";
-    };
-
-    const validatePassword = (password) => {
-        return /^[A-Za-z\d!?*()]{8,20}$/.test(password);
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData(prev => ({ ...prev, [name]: value }));
 
         let error = '';
-        switch (name) {
-            case 'username':
-                if (!validateUsername(value)) error = 'Только латинские, кириллические буквы и цифры, без пробелов, до 20 символов';
-                break;
-            case 'email':
-                if (!validateEmail(value)) error = 'Недействительный адрес электронной почты';
-                break;
-            case 'password':
-                if (!validatePassword(value)) error = 'Пароль должен быть 8-20 символов, написан на латинском алфавите (английском), может содержать заглавные, строчные буквы, цифры и спецсимволы (!?*())';
-                break;
-            case 'confirmPassword':
-                if (value !== formData.password) error = 'Пароли не совпадают';
-                break;
-            default:
-                break;
-        }
-        setErrors({ ...errors, [name]: error });
+        if (name === 'username' && !validateUsername(value)) error = 'Имя: до 20 букв и цифр';
+        if (name === 'email' && !validateEmail(value)) error = 'Неверный email';
+        if (name === 'password' && !validatePassword(value)) error = 'Пароль: 8-20 символов (!?*())';
+        if (name === 'confirmPassword' && value !== formData.password) error = 'Пароли не совпадают';
+
+        setErrors(prev => ({ ...prev, [name]: error }));
+    };
+
+    const handleCodeChange = (e) => {
+        const code = e.target.value;
+        setSelectedCode(code);
+        setFormData(prev => ({ ...prev, phoneCode: code }));
+        setPhoneError(validatePhoneNumber(code, formData.phoneNumber));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrorMessage('');
 
-        if (Object.values(errors).some(error => error) || Object.values(formData).some(value => !value)) {
-            setErrorMessage('Пожалуйста, исправьте ошибки в форме');
+        if (Object.values(errors).some(Boolean) || phoneError || Object.values(formData).some(v => !v)) {
+            setErrorMessage('Пожалуйста, заполните форму корректно');
             return;
         }
 
+        const userPayload = {
+            username: formData.username,
+            email: formData.email,
+            phone: formData.phoneCode + formData.phoneNumber,
+            password: formData.password
+        };
+
         try {
-            const newFormData = {
-            ...formData,
-            photoUrl: null
-            };
-            delete newFormData.confirmPassword;
-            const response = await registerUserRequest(newFormData);
-            console.log(response);
-            console.log(formData);
+            const response = await registerUserRequest(userPayload);
             if (response.status === 200 || response.status === 201) {
                 navigate('/login/confirm-email');
             } else {
-                setErrorMessage('Ошибка Сервера, Попробуйте Позже!')
+                setErrorMessage('Ошибка сервера');
             }
         } catch (err) {
-            console.log(err);
+            setErrorMessage('Ошибка подключения к серверу'|err);
         }
     };
-
 
     return (
         <RegisterContainer>
@@ -201,15 +186,13 @@ const RegisterPage = () => {
                 <Input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
                 {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
 
-                <Select onChange={(e) => setSelectedCode(e.target.value)}>
+                <Select value={selectedCode} onChange={handleCodeChange}>
                     {countryPhoneCodes.map(({ id, country, code }) => (
-                        <option key={id} value={code}>
-                            {country} ({code})
-                        </option>
+                        <option key={id} value={code}>{country} ({code})</option>
                     ))}
                 </Select>
 
-                <Input type="text" value={formData.phoneNumber} onChange={handlePhoneChange} placeholder="Введите номер" />
+                <Input type="text" value={formData.phoneNumber} onChange={handlePhoneChange} placeholder="Введите номер" required />
                 {phoneError && <ErrorMessage>{phoneError}</ErrorMessage>}
 
                 <Input type="password" name="password" placeholder="Пароль" value={formData.password} onChange={handleChange} required />
@@ -224,10 +207,11 @@ const RegisterPage = () => {
             {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
 
             <RegisterLinks>
-                <Link to="/login/sign-in">Уже Есть Аккаунт?</Link>
+                <Link to="/login/sign-in">Уже есть аккаунт?</Link>
             </RegisterLinks>
         </RegisterContainer>
     );
 };
 
 export default RegisterPage;
+
