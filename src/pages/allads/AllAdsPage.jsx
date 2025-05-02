@@ -2,7 +2,7 @@ import './AllAdsPageStyle';
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllAdsRequest } from "../../app/api";
-import { applyFilters } from "../../app/store";
+import {applyFilters, calculateAgeInMonths} from "../../app/store";
 import { AdsGrid, Container } from "./AllAdsPageStyle";
 import AdCard from "../../components/AdCard/AdCard";
 import Pagination from "../../components/Pagination/Pagination";
@@ -50,12 +50,6 @@ const AllAdsPage = () => {
         } catch (error) {
             console.error("Ошибка при загрузке объявлений:", error);
         }
-    };
-
-    const calculateAgeInMonths = (dateString) => {
-        const birthDate = new Date(dateString);
-        const now = new Date();
-        return (now.getFullYear() - birthDate.getFullYear()) * 12 + now.getMonth() - birthDate.getMonth();
     };
 
     const totalPages = Math.ceil(totalItems / itemsPerPage);

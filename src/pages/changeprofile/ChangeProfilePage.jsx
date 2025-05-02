@@ -69,13 +69,16 @@ const ChangeProfilePage = () => {
 
         try {
             const data = new FormData();
+
             const userPayload = {
                 username: formData.username,
                 email: formData.email,
-                phone: formData.phone
+                phone: formData.phone,
+                password: formData.password
             };
 
             data.append("user", new Blob([JSON.stringify(userPayload)], { type: 'application/json' }));
+
             if (formData.photo) {
                 data.append("photo", formData.photo);
             }
@@ -85,7 +88,7 @@ const ChangeProfilePage = () => {
                 navigate('/profile');
             }
         } catch (err) {
-            console.error("Ошибка обновления:", err);
+            console.error("Ошибка при обновлении:", err);
             setError("Ошибка при обновлении профиля.");
         }
     };

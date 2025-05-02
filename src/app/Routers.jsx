@@ -2,7 +2,7 @@ import {Route, Routes } from 'react-router-dom';
 import HomePage from '../pages/home/HomePage.jsx';
 import AllAdsPage from "../pages/allads/AllAdsPage";
 import ChangeAdPage from "../pages/changead/ChangeAdPage";
-import EmailPage from "../pages/email/EmailPage";
+import EmailSentPage from "../pages/email/EmailSentPage.jsx";
 import LoginPage from "../pages/login/LoginPage";
 import OneAdPage from "../pages/onead/OneAdPage";
 import PostAdPage from "../pages/postad/PostAdPage";
@@ -27,7 +27,7 @@ const Routers = () => {
             <Route path="/ad/change/:id" element={<ChangeAdPage />} />
             <Route path="/login/sign-in" element={<LoginPage />} />
             <Route path="/login/register" element={<RegisterPage />} />
-            <Route path="/login/confirm-email" element={<EmailPage />} />
+            <Route path="/login/confirm-email" element={<EmailSentPage />} />
             <Route path="/login/forgot-password" element={<ForgotPage />} />
             <Route path="/user/" element={<ProfilePage />} />
             <Route path="/user/:id" element={<ProfilePage />} />
