@@ -1,9 +1,17 @@
-import './ForgotPageStyle.css';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { sendPasswordResetRequest } from "../../app/api.js";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { sendPasswordResetRequest } from "../../app/api";
+import {
+    Container,
+    Title,
+    Label,
+    Input,
+    Button,
+    SuccessMessage,
+    ErrorMessage
+} from "./PasswordResetRequestPageStyle";
 
-const ForgotPage = () => {
+const PasswordResetRequestPage = () => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
@@ -17,8 +25,8 @@ const ForgotPage = () => {
         setError(null);
 
         try {
-            const response = await sendPasswordResetRequest({ email });
-            if (response.status === 200 || response.status === 201) {
+            const res = await sendPasswordResetRequest({ email });
+            if (res.status === 200 || res.status === 201) {
                 setMessage('Ссылка для восстановления пароля отправлена на вашу почту.');
                 setTimeout(() => navigate('/'), 3000);
             } else {
@@ -32,28 +40,28 @@ const ForgotPage = () => {
     };
 
     return (
-        <div className="forgot-page">
+        <Container>
             {!message && (
-                <form onSubmit={handleSubmit} className="forgot-form">
-                    <h2>Восстановление пароля</h2>
-                    <label>
+                <form onSubmit={handleSubmit}>
+                    <Title>Восстановление пароля</Title>
+                    <Label>
                         Введите ваш email:
-                        <input
+                        <Input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
-                    </label>
-                    <button type="submit" disabled={loading}>
+                    </Label>
+                    <Button type="submit" disabled={loading}>
                         {loading ? 'Отправка...' : 'Отправить'}
-                    </button>
+                    </Button>
                 </form>
             )}
-            {message && <div className="success-message">{message}</div>}
-            {error && <div className="error-message">{error}</div>}
-        </div>
+            {message && <SuccessMessage>{message}</SuccessMessage>}
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+        </Container>
     );
 };
 
-export default ForgotPage;
+export default PasswordResetRequestPage;

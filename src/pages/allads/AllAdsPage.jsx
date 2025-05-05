@@ -7,6 +7,7 @@ import { AdsGrid, Container } from "./AllAdsPageStyle";
 import AdCard from "../../components/AdCard/AdCard";
 import Pagination from "../../components/Pagination/Pagination";
 import FilterWindow from "../../components/FilterWindow/FilterWindow";
+import PostAdButton from "../../components/PostAdButton/PostAdButton.jsx";
 
 const AllAdsPage = () => {
     const [ads, setAds] = useState([]);
@@ -72,6 +73,7 @@ const AllAdsPage = () => {
                     itemsPerPage={itemsPerPage}
                 />
             )}
+            <PostAdButton />
         </Container>
     );
 };

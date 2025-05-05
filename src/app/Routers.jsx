@@ -1,14 +1,14 @@
-import {Route, Routes } from 'react-router-dom';
+ import {Route, Routes } from 'react-router-dom';
 import HomePage from '../pages/home/HomePage.jsx';
 import AllAdsPage from "../pages/allads/AllAdsPage";
 import ChangeAdPage from "../pages/changead/ChangeAdPage";
-import EmailSentPage from "../pages/email/EmailSentPage.jsx";
+import EmailSentPage from "../pages/emailsent/EmailSentPage.jsx";
 import LoginPage from "../pages/login/LoginPage";
 import OneAdPage from "../pages/onead/OneAdPage";
 import PostAdPage from "../pages/postad/PostAdPage";
 import ProfilePage from "../pages/profile/ProfilePage";
 import RegisterPage from "../pages/register/RegisterPage";
-import ForgotPage from "../pages/forgot/ForgotPage";
+import ForgotPage from "../pages/passwordresetrequest/PasswordResetRequestPage.jsx";
 import ErrorPage from "../pages/ErrorPage";
 import ChangeProfilePage from "../pages/changeprofile/ChangeProfilePage";
 import ChatPage from "../pages/chat/ChatPage";
