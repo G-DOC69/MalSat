@@ -2,7 +2,7 @@ import './App.css';
 import {BrowserRouter} from 'react-router-dom';
 import Routers from './app/Routers.jsx';
 import {createContext, useState} from 'react';
-import Topbar from "./pages/navbar/TopBar";
+import Topbar from "./components/navbar/TopBar";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const UserContext = createContext();

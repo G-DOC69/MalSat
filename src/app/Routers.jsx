@@ -1,18 +1,18 @@
  import {Route, Routes } from 'react-router-dom';
-import HomePage from '../pages/home/HomePage.jsx';
-import AllAdsPage from "../pages/allads/AllAdsPage";
-import ChangeAdPage from "../pages/changead/ChangeAdPage";
-import EmailSentPage from "../pages/emailsent/EmailSentPage.jsx";
-import LoginPage from "../pages/login/LoginPage";
-import OneAdPage from "../pages/onead/OneAdPage";
-import PostAdPage from "../pages/postad/PostAdPage";
-import ProfilePage from "../pages/profile/ProfilePage";
+import HomePage from '../pages/Home/HomePage.jsx';
+import AllAdsPage from "../pages/AllAds/AllAdsPage";
+import ChangeAdPage from "../pages/ChangeAd/ChangeAdPage";
+import EmailSentPage from "../pages/EmailSent/EmailSentPage.jsx";
+import LoginPage from "../pages/Login/LoginPage";
+import OneAdPage from "../pages/OneAd/OneAdPage";
+import PostAdPage from "../pages/PostAd/PostAdPage";
+import ProfilePage from "../pages/Profile/ProfilePage";
 import RegisterPage from "../pages/register/RegisterPage";
-import ForgotPage from "../pages/passwordresetrequest/PasswordResetRequestPage.jsx";
+import ForgotPage from "../pages/PasswordResetRequest/PasswordResetRequestPage.jsx";
 import ErrorPage from "../pages/ErrorPage";
-import ChangeProfilePage from "../pages/changeprofile/ChangeProfilePage";
-import ChatPage from "../pages/chat/ChatPage";
-import FavoriteAdsPage from "../pages/favoriteads/FavoriteAdsPage";
+import ChangeProfilePage from "../pages/ChangeProfile/ChangeProfilePage";
+import ChatPage from "../pages/Chat/ChatPage";
+import FavoriteAdsPage from "../pages/FavoriteAds/FavoriteAdsPage";
 import UserAdsPage from "../pages/userads/UserAdsPage";
 
 const Routers = () => {

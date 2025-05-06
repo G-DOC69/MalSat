@@ -122,7 +122,7 @@ const AdForm = ({
                 )}
             </FieldSet>
 
-            {onReplaceModeActivate && (
+            {typeof onReplaceModeActivate === 'function' && (
                 <ReplaceButton type="button" onClick={onReplaceModeActivate}>
                     Заменить все фото
                 </ReplaceButton>

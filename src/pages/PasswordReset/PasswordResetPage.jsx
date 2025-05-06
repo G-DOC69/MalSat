@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import {useSearchParams, useNavigate, useParams} from "react-router-dom";
 import { resetPasswordRequest } from "../../app/api";
 import {
     Container,
@@ -12,9 +12,8 @@ import {
 } from "./PasswordResetPageStyle";
 
 const PasswordResetPage = () => {
-    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const token = searchParams.get("token");
+    const { token } = useParams();
 
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");

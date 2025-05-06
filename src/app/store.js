@@ -1,4 +1,3 @@
-// --- Filtering logic ---
 export const applyFilters = (filter, ads, setTotalItems, setFilteredAds, itemsPerPage, page) => {
     let result = [...ads];
 
@@ -36,52 +35,4 @@ export const getUniqueValues = (ads, key) => {
 
 export const getUniqueAges = (ads) => {
     return [...new Set(ads.map(ad => ad.ageMonths).filter(n => typeof n === "number"))].sort((a, b) => a - b);
-};
-
-// --- Get sorted unique age list ---
-export const uniqueAges = (ads) => {
-    return [...new Set(ads.map(ad => calculateAgeInMonths(ad.age)))].sort((a, b) => a - b);
-};
-
-// --- Get unique values from ad fields (like animals, breeds, etc) ---
-export const uniqueValues = (ads, key) => {
-    return [...new Set(ads.map(ad => ad[key]))];
-};
-
-
-// --- Check if ad's age fits minimum ---
-export const checkMinAge = (adAge, minAge, ads) => {
-    const ageOrder = uniqueAges(ads);
-    return ageOrder.indexOf(adAge) >= ageOrder.indexOf(minAge);
-};
-
-// --- Check if ad's age fits maximum ---
-export const checkMaxAge = (adAge, maxAge, ads) => {
-    const ageOrder = uniqueAges(ads);
-    return ageOrder.indexOf(adAge) <= ageOrder.indexOf(maxAge);
-};
-
-
-
-// --- Handle form field changes ---
-export const handleAdFormChange = (e, setFormData) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-};
-
-// --- Handle photo upload for ads ---
-export const handleAdPhotoUpload = (e, formData, setFormData, setPreviewPhotos, setError) => {
-    const files = Array.from(e.target.files);
-
-    if (files.length + formData.photos.length > 10) {
-        setError('Максимум 10 фото!');
-        return;
-    }
-
-    const previews = files.map(file => URL.createObjectURL(file));
-    setPreviewPhotos(prev => [...prev, ...previews]);
-    setFormData(prev => ({
-        ...prev,
-        photos: [...prev.photos, ...files]
-    }));
 };
