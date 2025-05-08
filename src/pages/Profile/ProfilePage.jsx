@@ -3,12 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../App';
 import { getUserByIdRequest, getUserRequest } from "../../app/api";
 import { useCheckUser } from "../../hooks/useCheckUser";
-import {
-    ProfileContainer,
-    AdsTitle,
-    AdsContainer,
-    LoadMoreButton
-} from "./ProfilePageStyle";
 import AdCard from "../../components/AdCard/AdCard";
 import ProfileHeaderBlock from "../../components/ProfileHeaderBlock/ProfileHeaderBlock";
 
@@ -74,10 +68,10 @@ const ProfilePage = () => {
         setHasMoreAds(false);
     };
 
-    if (loading) return <p style={{ textAlign: "center" }}>Загрузка...</p>;
+    if (loading) return <p className="text-center mt-20 text-gray-600">Загрузка...</p>;
 
     return (
-        <ProfileContainer>
+        <div className="max-w-6xl mx-auto px-4 pt-24 pb-12">
             <ProfileHeaderBlock
                 username={profile.username}
                 phone={profile.phone}
@@ -86,17 +80,29 @@ const ProfilePage = () => {
                 onEdit={() => navigate("/user/change")}
             />
 
-            {ads.length > 0 && <AdsTitle>Объявления пользователя</AdsTitle>}
-            <AdsContainer>
+            {ads.length > 0 && (
+                <h2 className="text-2xl font-semibold text-gray-800 mt-10 mb-6">
+                    Объявления пользователя
+                </h2>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
                 {ads.map(ad => (
                     <AdCard key={ad.id} ad={ad} />
                 ))}
-            </AdsContainer>
+            </div>
 
             {hasMoreAds && (
-                <LoadMoreButton onClick={restoreAllAds}>Показать ещё</LoadMoreButton>
+                <div className="flex justify-center mt-8">
+                    <button
+                        onClick={restoreAllAds}
+                        className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition"
+                    >
+                        Показать ещё
+                    </button>
+                </div>
             )}
-        </ProfileContainer>
+        </div>
     );
 };
 

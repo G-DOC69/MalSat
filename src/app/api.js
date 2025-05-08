@@ -115,3 +115,9 @@ export const sendMessageRequest = async (chatId, token, messageText) => {
     setAuthToken(token);
     return axios.post(`/messages/${chatId}`, { text: messageText });
 };
+
+export const logoutRequest = () => Promise.resolve();
+export const getUnreadMessagesRequest = () => Promise.resolve([]);
+export const addToFavoriteRequest = () => Promise.resolve();
+export const removeFromFavoriteRequest = () => Promise.resolve();
+export const isFavoriteRequest = () => Promise.resolve(false);

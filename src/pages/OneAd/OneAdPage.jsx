@@ -9,12 +9,8 @@ import {
 } from "../../app/api";
 import { useCheckUser } from "../../hooks/useCheckUser";
 import { calculateAgeInMonths, calculateAgeInYears } from "../../app/store";
-import {
-    Container, InfoSection, Title, List,
-    Button, FavoriteButton
-} from "./OneAdPageStyle";
-import PhotoCarousel from "../../components/Ad/PhotoCarousel/PhotoCarousel.jsx";
-import SellerPreview from "../../components/Ad/SellerPreview/SellerPreview.jsx";
+import PhotoCarousel from "../../components/Ad/PhotoCarousel/PhotoCarousel";
+import SellerPreview from "../../components/Ad/SellerPreview/SellerPreview";
 
 const OneAdPage = () => {
     const { id } = useParams();
@@ -67,13 +63,16 @@ const OneAdPage = () => {
         }
     };
 
-    if (!ad) return <p>Загрузка...</p>;
+    if (!ad) return <p className="text-center mt-20 text-gray-600">Загрузка...</p>;
 
     return (
-        <Container>
-            <InfoSection>
-                <Title>{`Купить ${ad.breed} (${ad.animal})`}</Title>
-                <List>
+        <div className="max-w-5xl mx-auto px-4 pt-24 pb-12 flex flex-col lg:flex-row gap-10">
+            <div className="flex-1 space-y-4">
+                <h1 className="text-2xl font-semibold text-gray-900">
+                    Купить {ad.breed} ({ad.animal})
+                </h1>
+
+                <ul className="space-y-2 text-gray-700 text-base">
                     <li>📍 Регион Продажи: {ad.region}</li>
                     <li>🐾 Порода: {ad.breed}</li>
                     <li>
@@ -83,25 +82,39 @@ const OneAdPage = () => {
                     <li>📜 Описание: {ad.description}</li>
                     <li>💰 Цена: {ad.price} сом</li>
                     <li>👁 Просмотры: {ad.viewCount}</li>
-                </List>
+                </ul>
 
                 <SellerPreview seller={ad.seller} />
 
-                <Button onClick={handleChat} disabled={loadingChat}>
+                <button
+                    onClick={handleChat}
+                    disabled={loadingChat}
+                    className={`w-full md:w-auto px-6 py-2 text-white rounded-lg transition ${
+                        loadingChat ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
+                    }`}
+                >
                     {loadingChat ? "Загрузка..." : "💬 Чат с продавцом"}
-                </Button>
+                </button>
 
-                <FavoriteButton onClick={toggleFavorite} disabled={favoriteLoading}>
+                <button
+                    onClick={toggleFavorite}
+                    disabled={favoriteLoading}
+                    className={`w-full md:w-auto px-6 py-2 border border-gray-400 rounded-lg transition ${
+                        ad.isFavorite ? "bg-red-100 hover:bg-red-200" : "bg-gray-100 hover:bg-gray-200"
+                    }`}
+                >
                     {favoriteLoading
                         ? "Обновление..."
                         : ad.isFavorite
-                            ? "Удалить из избранного"
-                            : "Добавить в избранное"}
-                </FavoriteButton>
-            </InfoSection>
+                        ? "Удалить из избранного"
+                        : "Добавить в избранное"}
+                </button>
+            </div>
 
-            <PhotoCarousel photos={ad.photoUrls} />
-        </Container>
+            <div className="w-full lg:w-[50%]">
+                <PhotoCarousel photos={ad.photoUrls} />
+            </div>
+        </div>
     );
 };
 

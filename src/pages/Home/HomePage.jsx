@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { fetchTopAdsRequest } from "../../app/api";
-import { Container, AdsGrid } from "./HomePageStyle";
-import AdCard from "../../components/AdCard/AdCard.jsx";
-import PostAdButton from "../../components/PostAdButton/PostAdButton.jsx";
+import AdCard from "../../components/AdCard/AdCard";
+import PostAdButton from "../../components/PostAdButton/PostAdButton";
 
 const HomePage = () => {
     const [ads, setAds] = useState([]);
@@ -23,14 +22,19 @@ const HomePage = () => {
     }, []);
 
     return (
-        <Container>
-            <AdsGrid>
+        <div className="max-w-7xl mx-auto px-4 pt-24 pb-8">
+            <h1 className="text-3xl font-semibold text-center text-gray-800 mb-8">
+                Лучшие Объявления
+            </h1>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
                 {ads.map(ad => (
                     <AdCard key={ad.id} ad={ad} />
                 ))}
-            </AdsGrid>
+            </div>
+
             <PostAdButton />
-        </Container>
+        </div>
     );
 };
 

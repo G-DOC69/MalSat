@@ -7,7 +7,6 @@ import {
     sendMessageRequest
 } from "../../app/api";
 import { useCheckUser } from "../../hooks/useCheckUser";
-import { ChatContainer } from "./ChatPageStyle";
 
 import ChatSidebar from "../../components/chat/ChatSidebar/ChatSidebar";
 import ChatHeader from "../../components/chat/ChatHeader/ChatHeader";
@@ -20,7 +19,7 @@ const ChatPage = () => {
     const token = localStorage.getItem("access_token");
 
     const [chats, setChats] = useState([]);
-    const [chatData, setChatData] = useState(null); // ChatSingularResponse
+    const [chatData, setChatData] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
 
@@ -71,7 +70,7 @@ const ChatPage = () => {
     const sendMessage = async () => {
         if (!newMessage.trim() || newMessage.length > 300) return;
         try {
-            await fetchUnread(); // append new messages before sending
+            await fetchUnread();
             await sendMessageRequest(chatId, token, newMessage);
             setMessages(prev => [...prev, {
                 text: newMessage,
@@ -86,29 +85,40 @@ const ChatPage = () => {
     };
 
     return (
-        <ChatContainer>
-            <ChatSidebar chats={chats} currentId={chatId} />
-            {chatData ? (
-                <div style={{ width: "100%", display: "flex", flexDirection: "column" }}>
-                    <ChatHeader
-                        adId={chatData.adId}
-                        adPhotoUrl={chatData.adPhotoUrl}
-                        adAnimal={chatData.adAnimal}
-                        adBreed={chatData.adBreed}
-                        otherUser={chatData.otherUser}
-                        onRefresh={fetchUnread}
-                    />
-                    <ChatMessages messages={messages} />
-                    <ChatInputBar
-                        value={newMessage}
-                        setValue={setNewMessage}
-                        onSend={sendMessage}
-                    />
-                </div>
-            ) : (
-                <EmptyChatPlaceholder />
-            )}
-        </ChatContainer>
+        <div className="flex h-[calc(100vh-4rem)] pt-16 overflow-hidden">
+            <div className="w-[300px] border-r border-gray-200 bg-white overflow-y-auto">
+                <ChatSidebar chats={chats} currentId={chatId} />
+            </div>
+
+            <div className="flex-1 flex flex-col">
+                {chatData ? (
+                    <>
+                        <ChatHeader
+                            adId={chatData.adId}
+                            adPhotoUrl={chatData.adPhotoUrl}
+                            adAnimal={chatData.adAnimal}
+                            adBreed={chatData.adBreed}
+                            otherUser={chatData.otherUser}
+                            onRefresh={fetchUnread}
+                        />
+                        <div className="flex-1 overflow-y-auto bg-gray-50">
+                            <ChatMessages messages={messages} />
+                        </div>
+                        <div className="border-t border-gray-300 bg-white px-4 py-3">
+                            <ChatInputBar
+                                value={newMessage}
+                                setValue={setNewMessage}
+                                onSend={sendMessage}
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex-1 flex items-center justify-center bg-gray-100">
+                        <EmptyChatPlaceholder />
+                    </div>
+                )}
+            </div>
+        </div>
     );
 };
 
