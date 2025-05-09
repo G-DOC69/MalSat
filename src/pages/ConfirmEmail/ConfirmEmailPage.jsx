@@ -1,13 +1,24 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { confirmEmailRequest } from "../../app/api";
-import { PageContainer, Message, StyledLink, Subtitle } from "./ConfirmEmailPageStyle";
+import {
+    PageContainer,
+    Message,
+    StyledLink,
+    Subtitle
+} from "./ConfirmEmailPageStyle";
 
 const ConfirmEmailPage = () => {
     const { token } = useParams();
+    const navigate = useNavigate();
     const [status, setStatus] = useState("pending");
 
     useEffect(() => {
+        if (!token) {
+            navigate("/");
+            return;
+        }
+
         const confirmEmail = async () => {
             try {
                 const res = await confirmEmailRequest(token);
@@ -16,31 +27,28 @@ const ConfirmEmailPage = () => {
                 setStatus("error");
             }
         };
+
         confirmEmail();
-    }, [token]);
-
-    if (status === "pending") {
-        return (
-            <PageContainer>
-                <Message>Подтверждение аккаунта...</Message>
-            </PageContainer>
-        );
-    }
-
-    if (status === "success") {
-        return (
-            <PageContainer>
-                <Message>Аккаунт успешно подтвержден.</Message>
-                <StyledLink to="/login/sign-in">Перейти к входу</StyledLink>
-            </PageContainer>
-        );
-    }
+    }, [token, navigate]);
 
     return (
-        <PageContainer>
-            <Message>Не удалось подтвердить аккаунт.</Message>
-            <Subtitle>Попробуйте зарегистрироваться снова или повторить позже.</Subtitle>
-            <StyledLink to="/login/register">Регистрация</StyledLink>
+        <PageContainer aria-live="polite">
+            {status === "pending" && (
+                <Message>Подтверждение аккаунта...</Message>
+            )}
+            {status === "success" && (
+                <>
+                    <Message>Аккаунт успешно подтвержден.</Message>
+                    <StyledLink to="/login/sign-in">Перейти к входу</StyledLink>
+                </>
+            )}
+            {status === "error" && (
+                <>
+                    <Message>Не удалось подтвердить аккаунт.</Message>
+                    <Subtitle>Попробуйте зарегистрироваться снова или повторить позже.</Subtitle>
+                    <StyledLink to="/login/register">Регистрация</StyledLink>
+                </>
+            )}
         </PageContainer>
     );
 };

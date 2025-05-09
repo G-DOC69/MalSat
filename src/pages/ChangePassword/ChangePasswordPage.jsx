@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { changePasswordRequest } from "../../app/api";
+import { changePassword } from "../../app/api";
 import {
     Container,
     Title,
@@ -36,14 +36,17 @@ const ChangePasswordPage = () => {
 
         try {
             setLoading(true);
-            const res = await changePasswordRequest(token, {
-                oldPassword: currentPassword,
-                newPassword: newPassword
-            });
+            const res = await changePassword(token, currentPassword,newPassword);
 
             if (res.status === 200) {
                 setSuccess(true);
-                setTimeout(() => navigate("/profile"), 3000);
+                setCurrentPassword("");
+                setNewPassword("");
+                setConfirmPassword("");
+                setTimeout(() => {
+                    localStorage.removeItem("access_token");
+                    navigate("/login");
+                }, 2000);
             } else {
                 setError("Не удалось изменить пароль.");
             }
@@ -86,7 +89,7 @@ const ChangePasswordPage = () => {
                     {error && <ErrorMessage>{error}</ErrorMessage>}
                 </form>
             ) : (
-                <SuccessMessage>Пароль успешно изменён. Переход в профиль...</SuccessMessage>
+                <SuccessMessage>Пароль успешно изменён. Перенаправление на страницу входа...</SuccessMessage>
             )}
         </Container>
     );

@@ -1,74 +1,105 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { getFavoriteAdsRequest } from "../../app/api";
+import { getFavoritesRequest} from "../../app/api";
 import { useCheckUser } from "../../hooks/useCheckUser";
-import { applyFilters } from "../../app/store";
-import { Container, AdsGrid } from "./FavoriteAdsPageStyle.js";
-
-import AdCard from "../../components/AdCard/AdCard.jsx";
-import FilterWindow from "../../components/FilterWindow/FilterWindow.jsx";
-import Pagination from "../../components/Pagination/Pagination.jsx";
+import {applyFilters, calculateAgeInMonths} from "../../app/store";
+import { FixedSizeList as List } from "react-window";
+import AdCard from "../../components/AdCard/AdCard";
+import FilterWindow from "../../components/FilterWindow/FilterWindow";
+import { Container, Title, LoadingText, ErrorText, EmptyText, BackToTopButton, ResultCount } from './FavoriteAdsPageStyle.js';
+import PostAdButton from "../../components/PostAdButton/PostAdButton.jsx";
 
 const FavoriteAdsPage = () => {
+    const token = localStorage.getItem("access_token");
     const [ads, setAds] = useState([]);
     const [filteredAds, setFilteredAds] = useState([]);
-    const [page, setPage] = useState(1);
-    const [totalItems, setTotalItems] = useState(0);
     const [filter, setFilter] = useState({
-        animal: "",
-        breed: "",
-        minAge: "",
-        maxAge: "",
-        region: "",
-        minPrice: "",
-        maxPrice: ""
+        animal: '',
+        breed: '',
+        minAge: '',
+        maxAge: '',
+        region: '',
+        minPrice: '',
+        maxPrice: ''
     });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [showBackToTop, setShowBackToTop] = useState(false);
 
-    const itemsPerPage = 10;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const listRef = useRef(null);
     const navigate = useNavigate();
 
     useCheckUser();
 
     useEffect(() => {
-        const fetchFavorites = async () => {
-            try {
-                const token = localStorage.getItem("access_token");
-                const res = await getFavoriteAdsRequest(token);
-                setAds(res.data || []);
-            } catch (err) {
-                console.error("Ошибка загрузки избранных объявлений:", err);
-            }
-        };
-        fetchFavorites();
+        const controller = new AbortController();
+        setLoading(true);
+        setError(null);
+
+        getFavoritesRequest(token,controller.signal)
+            .then(res => {
+                const formatted = res.data.map(ad => ({
+                    ...ad,
+                    ageMonths: calculateAgeInMonths(ad.age)
+                }));
+                setAds(formatted);
+                setLoading(false);
+            })
+            .catch(err => {
+                if (err.name !== 'CanceledError') {
+                    setError('Ошибка загрузки.');
+                    setLoading(false);
+                }
+            });
+
+        return () => controller.abort();
     }, []);
 
     useEffect(() => {
-        applyFilters(filter, ads, setTotalItems, setFilteredAds, itemsPerPage, page);
-    }, [filter, ads, page]);
+        applyFilters(filter, ads, null, setFilteredAds);
+    }, [filter, ads]);
 
     useEffect(() => {
-        setPage(1);
-    }, [filter]);
+        const handleScroll = () => {
+            setShowBackToTop(window.scrollY > 400);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const Row = ({ index, style }) => (
+        <div style={style}>
+            <AdCard ad={filteredAds[index]} navigate={navigate} />
+        </div>
+    );
 
     return (
         <Container>
-            <h1>Избранные Объявления</h1>
-            <FilterWindow filter={filter} setFilter={setFilter} ads={ads} />
-            <AdsGrid>
-                {filteredAds.map(ad => (
-                    <AdCard key={ad.id} ad={ad} navigate={navigate} />
-                ))}
-            </AdsGrid>
-            {totalPages > 1 && (
-                <Pagination
-                    page={page}
-                    setPage={setPage}
-                    totalPages={totalPages}
-                    totalItems={totalItems}
-                    itemsPerPage={itemsPerPage}
-                />
+            <Title>Избранные Объявления</Title>
+            {!loading && !error && (
+                <ResultCount>Найдено: {filteredAds.length} объявлений</ResultCount>
             )}
+            <FilterWindow filter={filter} setFilter={setFilter} ads={ads} />
+            {loading && <LoadingText>Загрузка...</LoadingText>}
+            {error && <ErrorText>{error}</ErrorText>}
+            {!loading && filteredAds.length === 0 && <EmptyText>Ничего не найдено</EmptyText>}
+            {!loading && filteredAds.length > 0 && (
+                <List
+                    height={600}
+                    itemCount={filteredAds.length}
+                    itemSize={180}
+                    width={'100%'}
+                    ref={listRef}
+                >
+                    {Row}
+                </List>
+            )}
+            <PostAdButton />
+            {showBackToTop && <BackToTopButton onClick={scrollToTop}>Наверх</BackToTopButton>}
         </Container>
     );
 };

@@ -54,3 +54,17 @@ export const PreviewImage = styled.img`
     margin: 10px auto;
     display: block;
 `;
+
+export const Select = styled.select`
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 4px;
+`;
+
+export const ErrorText = styled.div`
+    color: red;
+    font-size: 0.875rem;
+    margin-top: 4px;
+`;

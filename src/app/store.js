@@ -1,4 +1,4 @@
-export const applyFilters = (filter, ads, setTotalItems, setFilteredAds, itemsPerPage, page) => {
+export const applyFilters = (filter, ads, _, setFilteredAds) => {
     let result = [...ads];
 
     if (filter.animal) result = result.filter(ad => ad.animal === filter.animal);
@@ -9,10 +9,7 @@ export const applyFilters = (filter, ads, setTotalItems, setFilteredAds, itemsPe
     if (filter.minPrice) result = result.filter(ad => ad.price >= Number(filter.minPrice));
     if (filter.maxPrice) result = result.filter(ad => ad.price <= Number(filter.maxPrice));
 
-    setTotalItems(result.length);
-    const start = (page - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    setFilteredAds(result.slice(start, end));
+    setFilteredAds(result);
 };
 
 export const calculateAgeInMonths = (birthDate) => {

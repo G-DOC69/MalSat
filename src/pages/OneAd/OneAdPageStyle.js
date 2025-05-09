@@ -28,40 +28,6 @@ export const List = styled.ul`
     }
 `;
 
-export const ImageSection = styled.div`
-    flex: 1;
-    min-width: 300px;
-    text-align: center;
-    position: relative;
-`;
-
-export const Image = styled.img`
-    width: 100%;
-    max-width: 350px;
-    border-radius: 8px;
-    object-fit: cover;
-`;
-
-export const NavButton = styled.button`
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    font-weight: bold;
-
-    &:first-of-type {
-        left: 10px;
-    }
-
-    &:last-of-type {
-        right: 10px;
-    }
-`;
 
 export const Button = styled.button`
     background: #1e3a8a;
@@ -79,32 +45,41 @@ export const Button = styled.button`
     }
 `;
 
-export const SellerSection = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 10px;
+export const DeliveryForm = styled.form`
     margin-top: 20px;
-    padding: 10px;
-    background: #f3f4f6;
+    padding: 16px;
+    border: 1px solid #ccc;
     border-radius: 8px;
-    text-decoration: none;
+    background: #f9f9f9;
 `;
 
-export const SellerPhoto = styled.img`
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-`;
+export const FormGroup = styled.div`
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
 
-export const SellerName = styled.p`
-    font-size: 18px;
-    font-weight: bold;
-    color: #1e3a8a;
-
-    &:hover {
-        text-decoration: underline;
+    label {
+        margin-bottom: 6px;
+        font-weight: 500;
     }
+`;
+
+export const Input = styled.input`
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+
+    &:focus {
+        border-color: #666;
+    }
+`;
+
+export const ErrorText = styled.p`
+  color: #d00000;
+  margin: 10px 0;
+  font-weight: bold;
 `;
 export const FavoriteButton = styled.button`
     background: ${({ disabled }) => (disabled ? "#94a3b8" : "#065f46")};

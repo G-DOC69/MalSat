@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../App';
 import { getUserByIdRequest, getUserRequest } from "../../app/api";
@@ -28,42 +28,23 @@ const ProfilePage = () => {
 
     useEffect(() => {
         setLoading(true);
-        if (id) {
-            fetchProfile(id);
-        } else {
-            fetchOwnProfile();
-        }
+        fetchProfileData(id);
     }, [id, user]);
 
-    const fetchProfile = async (targetId) => {
+    const fetchProfileData = async (targetId = null) => {
         try {
-            const res = await getUserByIdRequest(targetId, token);
+            const res = targetId
+                ? await getUserByIdRequest(targetId, token)
+                : await getUserRequest(token);
             const profileData = res.data;
             setProfile(profileData);
 
-            const allUserAds = profileData.advertisements || [];
-            setAllAds(allUserAds);
-            setAds(allUserAds.slice(0, 10));
-            setHasMoreAds(allUserAds.length > 10);
+            const adsData = profileData.advertisements || [];
+            setAllAds(adsData);
+            setAds(adsData.slice(0, 10));
+            setHasMoreAds(adsData.length > 10);
         } catch (err) {
             console.error("Ошибка загрузки профиля:", err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchOwnProfile = async () => {
-        try {
-            const res = await getUserRequest(token);
-            const profileData = res.data;
-            setProfile(profileData);
-
-            const ownAds = profileData.advertisements || [];
-            setAllAds(ownAds);
-            setAds(ownAds.slice(0, 10));
-            setHasMoreAds(ownAds.length > 10);
-        } catch (err) {
-            console.error("Ошибка загрузки собственного профиля:", err);
         } finally {
             setLoading(false);
         }
@@ -87,6 +68,9 @@ const ProfilePage = () => {
             />
 
             {ads.length > 0 && <AdsTitle>Объявления пользователя</AdsTitle>}
+            {ads.length === 0 && !loading && (
+                <p style={{ textAlign: "center" }}>У пользователя нет объявлений.</p>
+            )}
             <AdsContainer>
                 {ads.map(ad => (
                     <AdCard key={ad.id} ad={ad} />
@@ -94,7 +78,7 @@ const ProfilePage = () => {
             </AdsContainer>
 
             {hasMoreAds && (
-                <LoadMoreButton onClick={restoreAllAds}>Показать ещё</LoadMoreButton>
+                <LoadMoreButton onClick={restoreAllAds} aria-label="Показать больше объявлений">Показать ещё</LoadMoreButton>
             )}
         </ProfileContainer>
     );

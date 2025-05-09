@@ -1,6 +1,6 @@
 import { useState } from "react";
-import {useSearchParams, useNavigate, useParams} from "react-router-dom";
-import { resetPasswordRequest } from "../../app/api";
+import { useNavigate, useParams } from "react-router-dom";
+import { resetPassword } from "../../app/api";
 import {
     Container,
     Title,
@@ -10,6 +10,8 @@ import {
     ErrorMessage,
     SuccessMessage
 } from "./PasswordResetPageStyle";
+
+const validatePassword = (password) => /^[A-Za-z\d!?*()]{8,20}$/.test(password);
 
 const PasswordResetPage = () => {
     const navigate = useNavigate();
@@ -30,6 +32,11 @@ const PasswordResetPage = () => {
             return;
         }
 
+        if (!validatePassword(newPassword)) {
+            setError("Пароль должен содержать 8-20 символов и только латинские буквы, цифры или !?*().");
+            return;
+        }
+
         if (newPassword !== confirmPassword) {
             setError("Пароли не совпадают.");
             return;
@@ -37,7 +44,7 @@ const PasswordResetPage = () => {
 
         try {
             setLoading(true);
-            const res = await resetPasswordRequest({ token, newPassword });
+            const res = await resetPassword({ token, newPassword });
             if (res.status === 200) {
                 setSuccess(true);
                 setTimeout(() => navigate("/login"), 3000);
@@ -56,15 +63,17 @@ const PasswordResetPage = () => {
             <Title>Сброс пароля</Title>
             {!success ? (
                 <form onSubmit={handleSubmit}>
-                    <Label>Новый пароль:</Label>
+                    <Label htmlFor="newPassword">Новый пароль:</Label>
                     <Input
+                        id="newPassword"
                         type="password"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         required
                     />
-                    <Label>Повторите пароль:</Label>
+                    <Label htmlFor="confirmPassword">Повторите пароль:</Label>
                     <Input
+                        id="confirmPassword"
                         type="password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}

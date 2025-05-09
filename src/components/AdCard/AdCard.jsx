@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { AdCardStyled, AdImage, AdTitle, AdText } from "./AdCardStyle";
 import { calculateAgeInMonths, calculateAgeInYears } from "../../app/store";
+import React from "react";
 
 const AdCard = ({ ad }) => {
     const navigate = useNavigate();
@@ -26,4 +27,4 @@ const AdCard = ({ ad }) => {
     );
 };
 
-export default AdCard;
+export default React.memo(AdCard);

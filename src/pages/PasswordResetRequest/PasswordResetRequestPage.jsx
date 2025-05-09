@@ -1,65 +1,62 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { sendPasswordResetRequest } from "../../app/api";
+import { requestPasswordReset } from "../../app/api";
 import {
     Container,
     Title,
     Label,
     Input,
     Button,
-    SuccessMessage,
-    ErrorMessage
+    SuccessMessage
 } from "./PasswordResetRequestPageStyle";
 
 const PasswordResetRequestPage = () => {
     const [email, setEmail] = useState('');
-    const [message, setMessage] = useState(null);
-    const [error, setError] = useState(null);
+    const [messageSent, setMessageSent] = useState(false);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    const validateEmail = (email) =>
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
-        setMessage(null);
-        setError(null);
+        if (!validateEmail(email)) return;
 
+        setLoading(true);
         try {
-            const res = await sendPasswordResetRequest({ email });
-            if (res.status === 200 || res.status === 201) {
-                setMessage('Ссылка для восстановления пароля отправлена на вашу почту.');
-                setTimeout(() => navigate('/'), 3000);
-            } else {
-                setError('Ошибка при отправке запроса.');
-            }
+            await requestPasswordReset({ email });
         } catch (err) {
-            setError(err.response?.data?.message || 'Нет ответа от сервера.');
+            // silently ignore all errors
         } finally {
+            setMessageSent(true);
             setLoading(false);
+            setTimeout(() => navigate("/"), 3000);
         }
     };
 
     return (
         <Container>
-            {!message && (
+            {!messageSent ? (
                 <form onSubmit={handleSubmit}>
                     <Title>Восстановление пароля</Title>
-                    <Label>
-                        Введите ваш email:
-                        <Input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </Label>
+                    <Label htmlFor="email">Введите ваш email:</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
                     <Button type="submit" disabled={loading}>
-                        {loading ? 'Отправка...' : 'Отправить'}
+                        {loading ? "Отправка..." : "Отправить"}
                     </Button>
                 </form>
+            ) : (
+                <SuccessMessage>
+                    Если почта существует, ссылка отправлена. Проверьте вашу почту.
+                </SuccessMessage>
             )}
-            {message && <SuccessMessage>{message}</SuccessMessage>}
-            {error && <ErrorMessage>{error}</ErrorMessage>}
         </Container>
     );
 };

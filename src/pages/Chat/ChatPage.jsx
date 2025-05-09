@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
-    getChatsForUserRequest,
-    getChatByIdRequest,
+    getUserChatsRequest,
+    getChatDetailsRequest,
     getUnreadMessagesRequest,
     sendMessageRequest
 } from "../../app/api";
@@ -41,7 +41,7 @@ const ChatPage = () => {
 
     const fetchChats = async () => {
         try {
-            const res = await getChatsForUserRequest(token);
+            const res = await getUserChatsRequest(token);
             setChats(res.data);
         } catch (err) {
             console.error("Ошибка загрузки чатов:", err);
@@ -50,7 +50,7 @@ const ChatPage = () => {
 
     const fetchFullChat = async (id) => {
         try {
-            const res = await getChatByIdRequest(id, token);
+            const res = await getChatDetailsRequest(id, token);
             setChatData(res.data);
             setMessages(res.data.messages || []);
         } catch (err) {

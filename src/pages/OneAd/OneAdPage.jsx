@@ -2,16 +2,17 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
     getAdRequest,
-    getChatIdRequest,
-    addToFavoriteRequest,
-    removeFromFavoriteRequest,
-    isFavoriteRequest
+    createChatRequest,
+    addFavoriteRequest,
+    checkFavoriteRequest,
+    createDeliveryRequest,
+    removeFavoriteRequest
 } from "../../app/api";
 import { useCheckUser } from "../../hooks/useCheckUser";
 import { calculateAgeInMonths, calculateAgeInYears } from "../../app/store";
 import {
     Container, InfoSection, Title, List,
-    Button, FavoriteButton
+    Button, FavoriteButton, DeliveryForm, FormGroup, Input, ErrorText
 } from "./OneAdPageStyle";
 import PhotoCarousel from "../../components/Ad/PhotoCarousel/PhotoCarousel.jsx";
 import SellerPreview from "../../components/Ad/SellerPreview/SellerPreview.jsx";
@@ -22,7 +23,13 @@ const OneAdPage = () => {
     const [ad, setAd] = useState(null);
     const [loadingChat, setLoadingChat] = useState(false);
     const [favoriteLoading, setFavoriteLoading] = useState(false);
+    const [deliveryFormVisible, setDeliveryFormVisible] = useState(false);
+    const [deliveryForm, setDeliveryForm] = useState({ phone: '', address: '' });
+    const [deliveryError, setDeliveryError] = useState('');
+    const [deliverySubmitting, setDeliverySubmitting] = useState(false);
     const token = localStorage.getItem("access_token");
+
+    const isValidPhone = (phone) => /^[\d\s()+-]{5,20}$/.test(phone);
 
     useCheckUser();
 
@@ -31,6 +38,10 @@ const OneAdPage = () => {
             try {
                 const res = await getAdRequest(id, token);
                 setAd(res.data);
+                if (!res.data.isMine) {
+                    const favRes = await checkFavoriteRequest(id, token);
+                    setAd(prev => ({ ...prev, isFavorite: favRes.data }));
+                }
             } catch (err) {
                 console.error("Ошибка при загрузке объявления:", err);
             }
@@ -42,7 +53,7 @@ const OneAdPage = () => {
         if (!ad) return;
         setLoadingChat(true);
         try {
-            const res = await getChatIdRequest(ad.id, token);
+            const res = await createChatRequest(ad.id, token);
             navigate(`/chat/${res.data.chatId}`);
         } catch (err) {
             console.error("Ошибка при открытии чата:", err);
@@ -56,14 +67,39 @@ const OneAdPage = () => {
         setFavoriteLoading(true);
         try {
             ad.isFavorite
-                ? await removeFromFavoriteRequest(id, token)
-                : await addToFavoriteRequest(id, token);
-            const res = await isFavoriteRequest(id, token);
+                ? await removeFavoriteRequest(id, token)
+                : await addFavoriteRequest(id, token);
+            const res = await checkFavoriteRequest(id, token);
             setAd(prev => ({ ...prev, isFavorite: res.data }));
         } catch (err) {
             console.error("Ошибка при избранном:", err);
         } finally {
             setFavoriteLoading(false);
+        }
+    };
+
+    const handleDeliverySubmit = async (e) => {
+        e.preventDefault();
+        setDeliveryError('');
+        setDeliverySubmitting(true);
+        if (!isValidPhone(deliveryForm.phone)) {
+            setDeliveryError("Введите корректный номер телефона.");
+            setDeliverySubmitting(false);
+            return;
+        }
+        try {
+            await createDeliveryRequest(token, {
+                adId: ad.id,
+                phone: deliveryForm.phone,
+                address: deliveryForm.address
+            });
+            setDeliveryFormVisible(false);
+            setDeliveryForm({ phone: '', address: '' });
+        } catch (err) {
+            console.error("Ошибка при создании доставки:", err);
+            setDeliveryError("Ошибка при создании доставки. Попробуйте позже.");
+        } finally {
+            setDeliverySubmitting(false);
         }
     };
 
@@ -87,17 +123,57 @@ const OneAdPage = () => {
 
                 <SellerPreview seller={ad.seller} />
 
-                <Button onClick={handleChat} disabled={loadingChat}>
-                    {loadingChat ? "Загрузка..." : "💬 Чат с продавцом"}
-                </Button>
+                {token && !ad.isMine && (
+                    <>
+                        <Button onClick={handleChat} disabled={loadingChat}>
+                            {loadingChat ? "Загрузка..." : "💬 Чат с продавцом"}
+                        </Button>
 
-                <FavoriteButton onClick={toggleFavorite} disabled={favoriteLoading}>
-                    {favoriteLoading
-                        ? "Обновление..."
-                        : ad.isFavorite
-                            ? "Удалить из избранного"
-                            : "Добавить в избранное"}
-                </FavoriteButton>
+                        <FavoriteButton onClick={toggleFavorite} disabled={favoriteLoading}>
+                            {favoriteLoading
+                                ? "Обновление..."
+                                : ad.isFavorite
+                                    ? "Удалить из избранного"
+                                    : "Добавить в избранное"}
+                        </FavoriteButton>
+
+                        <Button onClick={() => setDeliveryFormVisible(true)}>
+                            Заказать доставку
+                        </Button>
+
+                        {deliveryFormVisible && (
+                            <DeliveryForm onSubmit={handleDeliverySubmit}>
+                                <FormGroup>
+                                    <label htmlFor="phone">Телефон</label>
+                                    <Input
+                                        id="phone"
+                                        name="phone"
+                                        value={deliveryForm.phone}
+                                        onChange={(e) => setDeliveryForm(prev => ({ ...prev, phone: e.target.value }))}
+                                        required
+                                    />
+                                </FormGroup>
+
+                                <FormGroup>
+                                    <label htmlFor="address">Адрес</label>
+                                    <Input
+                                        id="address"
+                                        name="address"
+                                        value={deliveryForm.address}
+                                        onChange={(e) => setDeliveryForm(prev => ({ ...prev, address: e.target.value }))}
+                                        required
+                                    />
+                                </FormGroup>
+
+                                {deliveryError && <ErrorText>{deliveryError}</ErrorText>}
+
+                                <Button type="submit" disabled={deliverySubmitting}>
+                                    {deliverySubmitting ? "Отправка..." : "Подтвердить доставку"}
+                                </Button>
+                            </DeliveryForm>
+                        )}
+                    </>
+                )}
             </InfoSection>
 
             <PhotoCarousel photos={ad.photoUrls} />

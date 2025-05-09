@@ -17,6 +17,7 @@ const LoginPage = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const [, setUser] = useContext(UserContext);
+    const [loading,setLoading] = useState(false);
 
     const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const validatePassword = (password) => password.length >= 6;
@@ -24,6 +25,7 @@ const LoginPage = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        setError(null)
     };
 
     const handleSubmit = async (e) => {
@@ -35,6 +37,7 @@ const LoginPage = () => {
         if (!validatePassword(password)) return setError("Пароль должен быть не менее 6 символов");
 
         try {
+            setLoading(true)
             const response = await loginUserRequest(formData);
             if (response.status === 200 && response.data) {
                 localStorage.setItem('access_token', response.data);
@@ -44,7 +47,14 @@ const LoginPage = () => {
                 setError("Ошибка авторизации");
             }
         } catch (err) {
-            setError(err.response?.data || "Ошибка сервера. Попробуйте позже.");
+            if (err.response?.status === 429) {
+                setError("Слишком много попыток. Попробуйте позже.");
+            } else {
+                setError(err.response?.data || "Ошибка сервера. Попробуйте позже.");
+            }
+        }
+        finally {
+            setLoading(false)
         }
     };
 
@@ -55,6 +65,7 @@ const LoginPage = () => {
                 <Input
                     type="email"
                     name="email"
+                    autoComplete="email"
                     placeholder="Адрес Электронной почты"
                     value={formData.email}
                     onChange={handleChange}
@@ -64,11 +75,12 @@ const LoginPage = () => {
                     type="password"
                     name="password"
                     placeholder="Пароль"
+                    autoComplete="current-password"
                     value={formData.password}
                     onChange={handleChange}
                     required
                 />
-                <Button type="submit">Войти</Button>
+                <Button type="submit" disabled={loading}>{loading ? "Загрузка" :"Войти"}</Button>
                 {error && <ErrorMessage>{error}</ErrorMessage>}
             </LoginForm>
             <LoginLinks>

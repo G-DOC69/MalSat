@@ -1,8 +1,7 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaRegComments, FaUser, FaBars, FaSignOutAlt } from "react-icons/fa";
 import { UserContext } from "../../App.jsx";
-import { logoutRequest } from "../../app/api.js";
 import {IconButton, Navbar, NavList, SiteTitle,NavButton,SideMenu,MenuLink} from "./TopBarStyle.js";
 
 const Topbar = () => {
@@ -11,16 +10,9 @@ const Topbar = () => {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        try {
-            const token = localStorage.getItem("access_token");
-            await logoutRequest(token);
-        } catch (e) {
-            console.error("Ошибка при логауте:", e);
-        } finally {
-            localStorage.removeItem("access_token");
-            setUser(false);
-            navigate("/");
-        }
+        localStorage.removeItem("access_token");
+        setUser(false);
+        navigate("/");
     };
 
     return (

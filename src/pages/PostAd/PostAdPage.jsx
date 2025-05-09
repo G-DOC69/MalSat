@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { postAdRequest } from "../../app/api.js";
 import { useCheckUser } from "../../hooks/useCheckUser.js";
@@ -29,6 +29,7 @@ const PostAdPage = () => {
     useCheckUser();
 
     const handleChange = (e) => {
+        if (error) setError(null);
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };

@@ -1,16 +1,15 @@
 import './ChangeAdPageStyle';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getAdRequest, updateAdRequest } from "../../app/api";
-import { useCheckUser } from "../../hooks/useCheckUser";
+import { getAdRequest, updateAdRequest } from '../../app/api';
+import { useCheckUser } from '../../hooks/useCheckUser';
 import {
     Container,
     FormSection,
     Title
-} from "./ChangeAdPageStyle";
-import AdForm from "../../components/AdForm/AdForm";
-import PhotoPreviewBlock from "../../components/PhotoPreviewBlock/PhotoPreviewBlock";
-import { formatLocalDateForInput } from "../../utils/dateUtils";
+} from './ChangeAdPageStyle';
+import AdForm from '../../components/AdForm/AdForm';
+import PhotoPreviewBlock from '../../components/PhotoPreviewBlock/PhotoPreviewBlock';
 
 const MAX_PHOTOS = 10;
 
@@ -45,7 +44,7 @@ const ChangeAdPage = () => {
                 setFormData({
                     animal: ad.animal,
                     breed: ad.breed,
-                    age: formatLocalDateForInput(ad.age),
+                    age: ad.age,
                     region: ad.region,
                     price: ad.price,
                     description: ad.description,
@@ -54,13 +53,17 @@ const ChangeAdPage = () => {
 
                 setPreviewPhotos(ad.photoUrls || []);
             } catch (err) {
-                console.error("Ошибка при загрузке:", err);
-                setError("Не удалось загрузить данные.");
+                if (err.response?.status === 403) {
+                    navigate('/');
+                    return;
+                }
+                console.error('Ошибка при загрузке:', err);
+                setError('Не удалось загрузить данные.');
             }
         };
 
         fetchData();
-    }, [id]);
+    }, [id, token, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -100,7 +103,7 @@ const ChangeAdPage = () => {
 
         try {
             const data = new FormData();
-            data.append("formData", JSON.stringify({
+            data.append('formData', JSON.stringify({
                 animal: formData.animal,
                 breed: formData.breed,
                 age: formData.age,
@@ -109,21 +112,22 @@ const ChangeAdPage = () => {
                 description: formData.description
             }));
 
-            data.append("replacePhotos", replacePhotos);
+            data.append('replacePhotos', replacePhotos);
 
             if (formData.photos.length > 0) {
                 formData.photos.forEach(file => {
-                    data.append("photos", file);
+                    data.append('photos', file);
                 });
             }
 
             const res = await updateAdRequest(id, token, data);
             if (res.status === 200) {
-                navigate("/ad/my-ads");
+                setError(null);
+                navigate('/ad/my-ads');
             }
         } catch (err) {
-            console.error("Ошибка при обновлении:", err);
-            setError("Ошибка при сохранении изменений.");
+            console.error('Ошибка при обновлении:', err);
+            setError('Ошибка при сохранении изменений.');
         } finally {
             setLoading(false);
         }
