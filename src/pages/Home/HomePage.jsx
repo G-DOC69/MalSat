@@ -3,9 +3,12 @@ import { fetchTopAdsRequest } from "../../app/api";
 import { Container, AdsGrid } from "./HomePageStyle";
 import AdCard from "../../components/AdCard/AdCard.jsx";
 import PostAdButton from "../../components/PostAdButton/PostAdButton.jsx";
+import {useSyncUserContext} from "../../hooks/useSyncUserContext.js";
 
 const HomePage = () => {
     const [ads, setAds] = useState([]);
+
+    useSyncUserContext()
 
     useEffect(() => {
         const getAds = async () => {

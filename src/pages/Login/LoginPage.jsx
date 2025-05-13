@@ -11,6 +11,7 @@ import {
     ErrorMessage,
     LoginLinks
 } from "./LoginPageStyle";
+import {useSyncUserContext} from "../../hooks/useSyncUserContext.js";
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
@@ -18,6 +19,8 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const [, setUser] = useContext(UserContext);
     const [loading,setLoading] = useState(false);
+
+    useSyncUserContext()
 
     const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const validatePassword = (password) => password.length >= 6;

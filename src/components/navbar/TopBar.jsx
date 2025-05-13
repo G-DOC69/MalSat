@@ -33,7 +33,7 @@ const Topbar = () => {
                         </IconButton>
                     </li> */}
                         <li>
-                            <IconButton onClick={() => navigate("/profile")}>
+                            <IconButton onClick={() => navigate("/user")}>
                                 <FaUser/>
                             </IconButton>
                         </li>

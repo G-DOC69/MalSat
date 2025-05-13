@@ -7,6 +7,7 @@ import { Container, Title, LoadingText, ErrorText, EmptyText, BackToTopButton, R
 import AdCard from '../../components/AdCard/AdCard';
 import FilterWindow from '../../components/FilterWindow/FilterWindow';
 import PostAdButton from '../../components/PostAdButton/PostAdButton';
+import {useSyncUserContext} from "../../hooks/useSyncUserContext.js";
 
 const AllAdsPage = () => {
     const [ads, setAds] = useState([]);
@@ -26,6 +27,8 @@ const AllAdsPage = () => {
 
     const listRef = useRef(null);
     const navigate = useNavigate();
+
+    useSyncUserContext()
 
     useEffect(() => {
         const controller = new AbortController();

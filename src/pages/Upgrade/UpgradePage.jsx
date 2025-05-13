@@ -11,6 +11,7 @@ import {
 } from './UpgradePageStyle';
 import OptionSelector from "../../components/Upgrade/OptionSelector/OptionSelector.jsx";
 import ReceiptUploadBlock from "../../components/Upgrade/ReceiptUploadBlock/ReceiptUploadBlock.jsx";
+import {useCheckUser} from "../../hooks/useCheckUser.js";
 
 const UpgradePage = () => {
     const { adId } = useParams();
@@ -26,6 +27,8 @@ const UpgradePage = () => {
     const [price, setPrice] = useState(null);
     const [message, setMessage] = useState('');
     const [submitted, setSubmitted] = useState(false);
+
+    useCheckUser()
 
     useEffect(() => {
         const fetchEligibility = async () => {
@@ -60,8 +63,24 @@ const UpgradePage = () => {
 
     const handleFileChange = (e) => {
         const selected = e.target.files[0];
-        if (selected) setFile(selected);
+        if (!selected) return;
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (!allowedTypes.includes(selected.type)) {
+            setMessage("Допустимы только изображения (JPG, PNG, WEBP).");
+            return;
+        }
+
+        if (selected.size > maxSize) {
+            setMessage("Размер файла не должен превышать 5MB.");
+            return;
+        }
+        setFile(selected);
+        setMessage("");
     };
+
 
     const handleSubmit = async () => {
         if (!file || !locked) return;
@@ -84,13 +103,6 @@ const UpgradePage = () => {
         }
     };
 
-    const durationOptions = Array.from(
-        new Set(tariffs.map(t => t.durationDays))
-    ).map(days => ({
-        label: formatDurationLabel(days),
-        value: days.toString()
-    }));
-
     const formatDurationLabel = (days) => {
         switch (days) {
             case 15: return '15 дней';
@@ -100,6 +112,14 @@ const UpgradePage = () => {
             default: return `${days} дней`;
         }
     };
+
+    const durationOptions = [...new Set(tariffs.map(t => t.durationDays))]
+        .sort((a, b) => a - b)
+        .map(days => ({
+            label: formatDurationLabel(days),
+            value: days.toString()
+        }));
+
 
     return (
         <Container>

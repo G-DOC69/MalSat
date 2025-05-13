@@ -82,7 +82,11 @@ const ReceiptPanel = ({ receipts: initial, token }) => {
                     <InfoText>Приоритет: {priorityLabels[r.requestedPriority]}</InfoText>
                     <InfoText>Дней: {r.durationDays}</InfoText>
                     <InfoText>Статус: {statusLabels[r.status]}</InfoText>
-                    <Photo src={r.receiptPhotoUrl} alt="receipt" onClick={() => setModalSrc(r.receiptPhotoUrl)} />
+                    <Photo
+                        src={`http://localhost:8080${r.receiptPhotoUrl}`}
+                        alt="receipt"
+                        onClick={() => setModalSrc(`http://localhost:8080${r.receiptPhotoUrl}`)}
+                    />
                     <StatusButton onClick={() => handleConfirm(r.receiptId)}>ПОДТВЕРДИТЬ</StatusButton>
                     <StatusButton onClick={() => handleReject(r.receiptId)}>ОТКЛОНИТЬ</StatusButton>
                 </ReceiptBox>

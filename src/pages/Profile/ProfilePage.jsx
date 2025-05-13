@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { UserContext } from '../../App';
 import { getUserByIdRequest, getUserRequest } from "../../app/api";
 import { useCheckUser } from "../../hooks/useCheckUser";
@@ -15,7 +15,6 @@ import ProfileHeaderBlock from "../../components/ProfileHeaderBlock/ProfileHeade
 const ProfilePage = () => {
     const { id } = useParams();
     const [user] = useContext(UserContext);
-    const navigate = useNavigate();
 
     const [profile, setProfile] = useState(null);
     const [ads, setAds] = useState([]);
@@ -35,7 +34,7 @@ const ProfilePage = () => {
         try {
             const res = targetId
                 ? await getUserByIdRequest(targetId, token)
-                : await getUserRequest(token);
+                : await getUserRequest(token );
             const profileData = res.data;
             setProfile(profileData);
 
@@ -60,11 +59,8 @@ const ProfilePage = () => {
     return (
         <ProfileContainer>
             <ProfileHeaderBlock
-                username={profile.username}
-                phone={profile.phone}
-                photoUrl={profile.photoUrl}
+                profile={profile}
                 isOwn={!id}
-                onEdit={() => navigate("/user/change")}
             />
 
             {ads.length > 0 && <AdsTitle>Объявления пользователя</AdsTitle>}

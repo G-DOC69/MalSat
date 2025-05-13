@@ -23,6 +23,7 @@ const ChatPage = () => {
     const [chatData, setChatData] = useState(null); // ChatSingularResponse
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
+    const [loading,setLoading]=useState(false);
 
     useCheckUser();
 
@@ -71,17 +72,20 @@ const ChatPage = () => {
     const sendMessage = async () => {
         if (!newMessage.trim() || newMessage.length > 300) return;
         try {
+            setLoading(true)
             await fetchUnread(); // append new messages before sending
             await sendMessageRequest(chatId, token, newMessage);
             setMessages(prev => [...prev, {
                 text: newMessage,
-                isMine: true,
+                mine: true,
                 isRead: false,
                 sentAt: new Date().toISOString()
             }]);
             setNewMessage("");
         } catch (err) {
             console.error("Ошибка отправки сообщения:", err);
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -103,6 +107,7 @@ const ChatPage = () => {
                         value={newMessage}
                         setValue={setNewMessage}
                         onSend={sendMessage}
+                        loading={loading}
                     />
                 </div>
             ) : (

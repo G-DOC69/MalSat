@@ -25,9 +25,9 @@ const PasswordResetRequestPage = () => {
 
         setLoading(true);
         try {
-            await requestPasswordReset({ email });
-        } catch (err) {
-            // silently ignore all errors
+            await requestPasswordReset(email);
+        } catch {
+            // suppress error
         } finally {
             setMessageSent(true);
             setLoading(false);

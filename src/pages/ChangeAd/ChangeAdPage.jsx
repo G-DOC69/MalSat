@@ -40,11 +40,15 @@ const ChangeAdPage = () => {
             try {
                 const res = await getAdRequest(id, token);
                 const ad = res.data;
-
+                const formatDateArray = (arr) => {
+                    if (!Array.isArray(arr) || arr.length !== 3) return '';
+                    const [year, month, day] = arr;
+                    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                };
                 setFormData({
                     animal: ad.animal,
                     breed: ad.breed,
-                    age: ad.age,
+                    age: formatDateArray(ad.age),
                     region: ad.region,
                     price: ad.price,
                     description: ad.description,

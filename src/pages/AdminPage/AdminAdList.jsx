@@ -10,6 +10,7 @@ import {
     AdImage,
     ActionButton
 } from './styles/AdminAdListStyle';
+import {useState} from "react";
 
 const AdminAdList = ({ ads, token, userId, onSelectAd, onClearChat }) => {
     const [query, setQuery] = useState('');

@@ -20,10 +20,10 @@ const ChatHeader = ({ adId, adPhotoUrl, adAnimal, adBreed, otherUser, onRefresh 
             </InfoBlock>
 
             <InfoBlock>
-                <Link to={`/profile/${otherUser.id}`}>
+                <Link to={`/user/${otherUser.id}`}>
                     <HeaderImage src={otherUser.photoUrl} alt="User" />
                 </Link>
-                <Link to={`/profile/${otherUser.id}`}>
+                <Link to={`/user/${otherUser.id}`}>
                     <div>
                         <p>{otherUser.username}</p>
                     </div>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllDeliveriesForOperator, getAllReceiptsForOperator } from '../../app/api';
 import { Container, StartButton, ErrorText } from './OperatorPageStyle';
 import OperatorPanel from "../../components/Operator/OperatorPanel/OperatorPanel.jsx";
+import {useSyncUserContext} from "../../hooks/useSyncUserContext.js";
 const OperatorPage = () => {
     const [deliveries, setDeliveries] = useState([]);
     const [receipts, setReceipts] = useState([]);
@@ -10,6 +11,8 @@ const OperatorPage = () => {
     const [error,] = useState(null);
     const token = localStorage.getItem('access_token');
     const navigate = useNavigate();
+
+    useSyncUserContext()
 
     const handleStart = async () => {
         try {

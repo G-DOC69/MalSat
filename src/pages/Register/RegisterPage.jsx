@@ -12,6 +12,7 @@ import {
     ErrorMessage,
     RegisterLinks
 } from './RegisterPageStyle';
+import {useSyncUserContext} from "../../hooks/useSyncUserContext.js";
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -27,6 +28,8 @@ const RegisterPage = () => {
     const navigate = useNavigate();
     const [selectedCode, setSelectedCode] = useState('+996');
     const [phoneError, setPhoneError] = useState('');
+
+    useSyncUserContext()
 
     const handlePhoneChange = (e) => {
         const number = e.target.value;
@@ -94,8 +97,11 @@ const RegisterPage = () => {
                 setErrorMessage('Ошибка сервера');
             }
         } catch (err) {
-            console.log("Response Error: ", err);
-            setErrorMessage('Ошибка подключения к серверу');
+            if (err.response && err.response.status === 400) {
+                setErrorMessage("Данный почтовый адрес уже используется");
+            } else {
+                setErrorMessage("Произошла неизвестная ошибка. Попробуйте позже.");
+            }
         }
     };
 

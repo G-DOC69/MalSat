@@ -44,7 +44,7 @@ const PasswordResetPage = () => {
 
         try {
             setLoading(true);
-            const res = await resetPassword({ token, newPassword });
+            const res = await resetPassword( token, newPassword);
             if (res.status === 200) {
                 setSuccess(true);
                 setTimeout(() => navigate("/login"), 3000);

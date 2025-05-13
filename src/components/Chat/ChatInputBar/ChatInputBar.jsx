@@ -6,7 +6,7 @@ import {
     LimitWarning
 } from "./ChatInputBarStyle";
 
-const ChatInputBar = ({ value, setValue, onSend }) => {
+const ChatInputBar = ({ value, setValue, onSend ,loading}) => {
     const [limitExceeded, setLimitExceeded] = useState(false);
 
     const handleChange = (e) => {
@@ -25,7 +25,7 @@ const ChatInputBar = ({ value, setValue, onSend }) => {
                     onKeyDown={(e) => e.key === "Enter" && onSend()}
                     maxLength={300}
                 />
-                <SendButton onClick={onSend} disabled={!value.trim()}>
+                <SendButton onClick={onSend} disabled={!value.trim()||loading}>
                     Отправить
                 </SendButton>
             </InputContainer>

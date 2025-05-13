@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import {useParams, useNavigate, Link} from "react-router-dom";
 import {
     getAdRequest,
     createChatRequest,
@@ -8,7 +8,6 @@ import {
     createDeliveryRequest,
     removeFavoriteRequest
 } from "../../app/api";
-import { useCheckUser } from "../../hooks/useCheckUser";
 import { calculateAgeInMonths, calculateAgeInYears } from "../../app/store";
 import {
     Container, InfoSection, Title, List,
@@ -16,6 +15,7 @@ import {
 } from "./OneAdPageStyle";
 import PhotoCarousel from "../../components/Ad/PhotoCarousel/PhotoCarousel.jsx";
 import SellerPreview from "../../components/Ad/SellerPreview/SellerPreview.jsx";
+import {useSyncUserContext} from "../../hooks/useSyncUserContext.js";
 
 const OneAdPage = () => {
     const { id } = useParams();
@@ -29,16 +29,16 @@ const OneAdPage = () => {
     const [deliverySubmitting, setDeliverySubmitting] = useState(false);
     const token = localStorage.getItem("access_token");
 
-    const isValidPhone = (phone) => /^[\d\s()+-]{5,20}$/.test(phone);
+    useSyncUserContext()
 
-    useCheckUser();
+    const isValidPhone = (phone) => /^[\d\s()+-]{5,20}$/.test(phone);
 
     useEffect(() => {
         const fetchAd = async () => {
             try {
                 const res = await getAdRequest(id, token);
                 setAd(res.data);
-                if (!res.data.isMine) {
+                if (!res.data.isMine && token) {
                     const favRes = await checkFavoriteRequest(id, token);
                     setAd(prev => ({ ...prev, isFavorite: favRes.data }));
                 }
@@ -53,7 +53,7 @@ const OneAdPage = () => {
         if (!ad) return;
         setLoadingChat(true);
         try {
-            const res = await createChatRequest(ad.id, token);
+            const res = await createChatRequest( token,ad.id);
             navigate(`/chat/${res.data.chatId}`);
         } catch (err) {
             console.error("Ошибка при открытии чата:", err);
@@ -123,7 +123,7 @@ const OneAdPage = () => {
 
                 <SellerPreview seller={ad.seller} />
 
-                {token && !ad.isMine && (
+                {token && !ad.owner && (
                     <>
                         <Button onClick={handleChat} disabled={loadingChat}>
                             {loadingChat ? "Загрузка..." : "💬 Чат с продавцом"}
@@ -172,6 +172,16 @@ const OneAdPage = () => {
                                 </Button>
                             </DeliveryForm>
                         )}
+                    </>
+                )}
+                {token && ad.owner && (
+                    <>
+                        <Button onClick={() => navigate(`/ad/change/${ad.id}`)}>
+                            Изменить объявление
+                        </Button>
+                        <Button onClick={() => navigate(`/ad/upgrade/${ad.id}`)}>
+                            Повысить Статус
+                        </Button>
                     </>
                 )}
             </InfoSection>

@@ -28,42 +28,48 @@ import ContactUsPage from "../pages/ContactUs/ContactUsPage.jsx";
 import DeliveryPage from "../pages/Delivery/DeliveryPage.jsx";
 import UpgradePage from "../pages/Upgrade/UpgradePage.jsx";
 import ErrorPage from "../pages/ErrorPage.jsx";
+import OperatorPage from "../pages/Operator/OperatorPage.jsx";
+import AdminPage from "../pages/AdminPage/AdminPage.jsx";
 const Routers = () => (
     <Routes>
             {/* Home & Ads */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/ad/:id" element={<OneAdPage />} />
-            <Route path="/ad/all-ads" element={<AllAdsPage />} />
-            <Route path="/ad/my-ads" element={<UserAdsPage />} />
-            <Route path="/ad/favorites" element={<FavoriteAdsPage />} />
-            <Route path="/ad/post" element={<PostAdPage />} />
-            <Route path="/ad/change/:id" element={<ChangeAdPage />} />
-            <Route path="/ad/upgrade/:adId" element={<UpgradePage />} />
+            <Route path="/" element={<HomePage />} />{/*backend-compliant*/}
+            <Route path="/ad/:id" element={<OneAdPage />} />{/*backend-compliant*/}
+            <Route path="/ad/all-ads" element={<AllAdsPage />} />{/*backend-compliant*/}
+            <Route path="/ad/my-ads" element={<UserAdsPage />} />{/*backend-compliant*/}
+            <Route path="/ad/favorites" element={<FavoriteAdsPage />} />{/*backend-compliant*/}
+            <Route path="/ad/post" element={<PostAdPage />} />{/*backend-compliant*/}
+            <Route path="/ad/change/:id" element={<ChangeAdPage />} />{/*backend-compliant*/}
+            <Route path="/ad/upgrade/:adId" element={<UpgradePage />} />{/*backend-compliant*/}
 
             {/* User */}
-            <Route path="/user" element={<ProfilePage />} />
-            <Route path="/user/:id" element={<ProfilePage />} />
-            <Route path="/user/change" element={<ChangeProfilePage />} />
-            <Route path="/user/change-password" element={<ChangePasswordPage />} />
+            <Route path="/user" element={<ProfilePage />} />{/*backend-compliant*/}
+            <Route path="/user/:id" element={<ProfilePage />} />{/*backend-compliant*/}
+            <Route path="/user/change" element={<ChangeProfilePage />} />{/*backend-compliant*/}
+            <Route path="/user/change-password" element={<ChangePasswordPage />} />{/*backend-compliant*/}
 
             {/* Auth */}
-            <Route path="/login/sign-in" element={<LoginPage />} />
-            <Route path="/login/register" element={<RegisterPage />} />
-            <Route path="/login/confirm-email" element={<EmailSentPage />} />
-            <Route path="/login/confirm/:token" element={<ConfirmEmailPage />} />
-            <Route path="/login/forgot-password" element={<PasswordResetRequestPage />} />
-            <Route path="/reset-password/:token" element={<PasswordResetPage />} />
+            <Route path="/login/sign-in" element={<LoginPage />} />{/*backend-compliant*/}
+            <Route path="/login/register" element={<RegisterPage />} />{/*backend-compliant*/}
+            <Route path="/login/confirm-email" element={<EmailSentPage />} />{/*backend-compliant*/}
+            <Route path="/login/confirm/:token" element={<ConfirmEmailPage />} />{/*backend-compliant*/}
+            <Route path="/login/forgot-password" element={<PasswordResetRequestPage />} />{/*backend-compliant*/}
+            <Route path="/reset-password/:token" element={<PasswordResetPage />} />{/*backend-compliant*/}
 
             {/* Communication */}
-            <Route path="/chat" element={<ChatPage />} />
-            <Route path="/chat/:id" element={<ChatPage />} />
-            <Route path="/contact" element={<ContactUsPage />} />
+            <Route path="/chat" element={<ChatPage />} />{/*backend-compliant*/}
+            <Route path="/chat/:chatId" element={<ChatPage />} />{/*backend-compliant*/}
+            <Route path="/contact" element={<ContactUsPage />} />{/*backend-compliant*/}
 
             {/* Delivery */}
-            <Route path="/delivery" element={<DeliveryPage />} />
+            <Route path="/delivery" element={<DeliveryPage />} />{/*backend-compliant*/}
+            <Route path="/operator" element={<OperatorPage />} />{/*backend-compliant*/}
+
+            {/*Admin*/}
+            <Route path="/admin" element={<AdminPage />} />{/*backend-compliant*/}
 
             {/* Catch-all */}
-            <Route path="*" element={<ErrorPage />} />
+            <Route path="*" element={<ErrorPage />} />{/*backend-compliant*/}
     </Routes>
 );
 

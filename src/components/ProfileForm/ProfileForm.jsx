@@ -61,8 +61,10 @@ const ProfileForm = ({
         <FieldSet>
             <Label>Телефон</Label>
             <Select value={selectedCode} onChange={handleCodeChange}>
-                {countryPhoneCodes.map(({ code, country }) => (
-                    <option key={code} value={code}>{country} ({code})</option>
+                {countryPhoneCodes.map(({ code, country }, index) => (
+                    <option key={`${code}-${country}-${index}`} value={code}>
+                        {country} ({code})
+                    </option>
                 ))}
             </Select>
             <Input

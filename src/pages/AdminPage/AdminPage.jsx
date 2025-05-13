@@ -18,6 +18,7 @@ import {
     ActionButton,
     ErrorText
 } from './styles/AdminPageStyle';
+import {useSyncUserContext} from "../../hooks/useSyncUserContext.js";
 
 const AdminPage = () => {
     const navigate = useNavigate();
@@ -37,6 +38,8 @@ const AdminPage = () => {
     const [showChatList, setShowChatList] = useState(false);
 
     const [adOwnerId, setAdOwnerId] = useState(null);
+
+    useSyncUserContext()
 
     const handleStart = async () => {
         try {
