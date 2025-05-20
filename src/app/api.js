@@ -1,7 +1,7 @@
 // api.js
 import axios from 'axios';
 
-axios.defaults.baseURL = 'https://malback.onrender.com/api';
+axios.defaults.baseURL = 'http://localhost:8080/api';
 
 const setAuthToken = (token) => {
     if (token) {
