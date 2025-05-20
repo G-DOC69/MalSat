@@ -37,7 +37,24 @@ const UserAdsPage = () => {
                 const res = await getUserAdsRequest(token);
                 setAds(res.data || []);
             } catch (err) {
-                console.error("Ошибка загрузки объявлений пользователя:", err);
+                const code = err.response?.status;
+
+                if (code === 401) {
+                    localStorage.removeItem("access_token");
+                    navigate("/");
+                    return;
+                }
+
+                switch (code) {
+                    case 403:
+                        console.error("Доступ к объявлениям запрещён.");
+                        break;
+                    case 500:
+                        console.error("Ошибка сервера при загрузке объявлений.");
+                        break;
+                    default:
+                        console.error("Неизвестная ошибка:", err.response?.data?.message || err.message);
+                }
             }
         };
         fetchUserAds();

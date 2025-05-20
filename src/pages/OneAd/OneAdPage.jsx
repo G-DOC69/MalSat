@@ -43,7 +43,27 @@ const OneAdPage = () => {
                     setAd(prev => ({ ...prev, isFavorite: favRes.data }));
                 }
             } catch (err) {
-                console.error("Ошибка при загрузке объявления:", err);
+                const code = err.response?.status;
+
+                if (code === 401) {
+                    localStorage.removeItem("access_token");
+                    navigate("/");
+                    return;
+                }
+
+                switch (code) {
+                    case 403:
+                        console.error("Доступ к объявлению запрещён.");
+                        break;
+                    case 404:
+                        console.error("Объявление не найдено.");
+                        break;
+                    case 500:
+                        console.error("Ошибка сервера при загрузке объявления.");
+                        break;
+                    default:
+                        console.error("Ошибка при загрузке объявления:", err.response?.data?.message || err.message);
+                }
             }
         };
         fetchAd();
@@ -56,7 +76,27 @@ const OneAdPage = () => {
             const res = await createChatRequest( token,ad.id);
             navigate(`/chat/${res.data.chatId}`);
         } catch (err) {
-            console.error("Ошибка при открытии чата:", err);
+            const code = err.response?.status;
+
+            if (code === 401) {
+                localStorage.removeItem("access_token");
+                navigate("/");
+                return;
+            }
+
+            switch (code) {
+                case 403:
+                    console.error("Вы не можете начать чат по этому объявлению.");
+                    break;
+                case 404:
+                    console.error("Объявление для чата не найдено.");
+                    break;
+                case 500:
+                    console.error("Ошибка сервера при создании чата.");
+                    break;
+                default:
+                    console.error("Ошибка при открытии чата:", err.response?.data?.message || err.message);
+            }
         } finally {
             setLoadingChat(false);
         }
@@ -72,7 +112,27 @@ const OneAdPage = () => {
             const res = await checkFavoriteRequest(id, token);
             setAd(prev => ({ ...prev, isFavorite: res.data }));
         } catch (err) {
-            console.error("Ошибка при избранном:", err);
+            const code = err.response?.status;
+
+            if (code === 401) {
+                localStorage.removeItem("access_token");
+                navigate("/");
+                return;
+            }
+
+            switch (code) {
+                case 403:
+                    console.error("Нет прав на изменение избранного.");
+                    break;
+                case 404:
+                    console.error("Объявление не найдено.");
+                    break;
+                case 500:
+                    console.error("Ошибка сервера при изменении избранного.");
+                    break;
+                default:
+                    console.error("Ошибка при избранном:", err.response?.data?.message || err.message);
+            }
         } finally {
             setFavoriteLoading(false);
         }
@@ -96,8 +156,30 @@ const OneAdPage = () => {
             setDeliveryFormVisible(false);
             setDeliveryForm({ phone: '', address: '' });
         } catch (err) {
-            console.error("Ошибка при создании доставки:", err);
-            setDeliveryError("Ошибка при создании доставки. Попробуйте позже.");
+            const code = err.response?.status;
+
+            if (code === 401) {
+                localStorage.removeItem("access_token");
+                navigate("/");
+                return;
+            }
+
+            switch (code) {
+                case 400:
+                    setDeliveryError("Неверные данные для доставки.");
+                    break;
+                case 403:
+                    setDeliveryError("Вы не можете заказать доставку этого объявления.");
+                    break;
+                case 404:
+                    setDeliveryError("Объявление не найдено.");
+                    break;
+                case 500:
+                    setDeliveryError("Ошибка сервера при создании доставки.");
+                    break;
+                default:
+                    setDeliveryError(err.response?.data?.message || "Неизвестная ошибка.");
+            }
         } finally {
             setDeliverySubmitting(false);
         }

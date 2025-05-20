@@ -21,16 +21,31 @@ const DeliveryPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                setLoading(true)
+                setLoading(true);
                 const from = await getDeliveriesRequestedFrom(token);
                 const by = await getDeliveriesRequestedBy(token);
                 setRequestedFrom(from.data);
                 setRequestedBy(by.data);
             } catch (err) {
-                console.error(err)
-                setError('Ошибка при загрузке данных');
+                const code = err.response?.status;
+                if (code === 401) {
+                    localStorage.removeItem("access_token");
+                    window.location.href = "/";
+                    return;
+                }
+
+                switch (code) {
+                    case 403:
+                        setError("Доступ к заявкам запрещён.");
+                        break;
+                    case 500:
+                        setError("Ошибка сервера при загрузке заявок.");
+                        break;
+                    default:
+                        setError("Ошибка при загрузке данных.");
+                }
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
         };
         fetchData();
@@ -77,8 +92,29 @@ const DeliveryPage = () => {
             setTimeout(() => setPhoneError(''), 100);
             setConfirmForm({ phoneNumber: '', address: '' });
         } catch (err) {
-            console.error(err)
-            setError('Ошибка при подтверждении');
+            const code = err.response?.status;
+            if (code === 401) {
+                localStorage.removeItem("access_token");
+                window.location.href = "/";
+                return;
+            }
+
+            switch (code) {
+                case 400:
+                    setError("Неверные данные для подтверждения.");
+                    break;
+                case 403:
+                    setError("Вы не можете подтвердить эту доставку.");
+                    break;
+                case 404:
+                    setError("Заявка на доставку не найдена.");
+                    break;
+                case 500:
+                    setError("Ошибка сервера при подтверждении.");
+                    break;
+                default:
+                    setError("Ошибка при подтверждении.");
+            }
         } finally {
             setLoading(false)
         }
@@ -88,8 +124,27 @@ const DeliveryPage = () => {
         try {
             await denyDeliveryRequest(token, deliveryId);
             setRequestedFrom(prev => prev.filter(d => d.deliveryId !== deliveryId));
-        } catch {
-            setError('Ошибка при отклонении');
+        } catch (err) {
+            const code = err.response?.status;
+            if (code === 401) {
+                localStorage.removeItem("access_token");
+                window.location.href = "/";
+                return;
+            }
+
+            switch (code) {
+                case 403:
+                    setError("Вы не можете отклонить эту доставку.");
+                    break;
+                case 404:
+                    setError("Заявка на доставку не найдена.");
+                    break;
+                case 500:
+                    setError("Ошибка сервера при отклонении доставки.");
+                    break;
+                default:
+                    setError("Ошибка при отклонении.");
+            }
         }
     };
 

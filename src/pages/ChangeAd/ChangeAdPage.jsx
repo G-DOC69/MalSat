@@ -40,34 +40,60 @@ const ChangeAdPage = () => {
             try {
                 const res = await getAdRequest(id, token);
                 const ad = res.data;
+
+                if (!ad) throw new Error('Объявление не найдено');
+
                 const formatDateArray = (arr) => {
                     if (!Array.isArray(arr) || arr.length !== 3) return '';
                     const [year, month, day] = arr;
                     return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 };
+
                 setFormData({
-                    animal: ad.animal,
-                    breed: ad.breed,
+                    animal: ad.animal || '',
+                    breed: ad.breed || '',
                     age: formatDateArray(ad.age),
-                    region: ad.region,
-                    price: ad.price,
-                    description: ad.description,
+                    region: ad.region || '',
+                    price: ad.price || '',
+                    description: ad.description || '',
                     photos: []
                 });
 
                 setPreviewPhotos(ad.photoUrls || []);
             } catch (err) {
-                if (err.response?.status === 403) {
+                const code = err.response?.status;
+
+                if (code === 401) {
+                    localStorage.removeItem('access_token');
                     navigate('/');
                     return;
                 }
-                console.error('Ошибка при загрузке:', err);
-                setError('Не удалось загрузить данные.');
+
+                if (code === 403) {
+                    navigate('/');
+                    return;
+                }
+
+                switch (code) {
+                    case 400:
+                        setError("Некорректный запрос. Проверьте параметры.");
+                        break;
+                    case 404:
+                        setError("Объявление не найдено.");
+                        break;
+                    case 500:
+                        setError("Ошибка сервера при загрузке объявления.");
+                        break;
+                    default:
+                        setError(err.response?.data?.message || "Ошибка при загрузке данных.");
+                }
             }
+
         };
 
         fetchData();
     }, [id, token, navigate]);
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -115,7 +141,6 @@ const ChangeAdPage = () => {
                 price: formData.price,
                 description: formData.description
             }));
-
             data.append('replacePhotos', replacePhotos);
 
             if (formData.photos.length > 0) {
@@ -126,16 +151,38 @@ const ChangeAdPage = () => {
 
             const res = await updateAdRequest(id, token, data);
             if (res.status === 200) {
-                setError(null);
                 navigate('/ad/my-ads');
             }
         } catch (err) {
-            console.error('Ошибка при обновлении:', err);
-            setError('Ошибка при сохранении изменений.');
+            const code = err.response?.status;
+
+            if (code === 401) {
+                localStorage.removeItem('access_token');
+                navigate('/');
+                return;
+            }
+
+            switch (code) {
+                case 400:
+                    setError("Некорректные данные. Проверьте форму.");
+                    break;
+                case 403:
+                    navigate('/');
+                    break;
+                case 404:
+                    setError("Объявление для обновления не найдено.");
+                    break;
+                case 500:
+                    setError("Внутренняя ошибка сервера. Повторите позже.");
+                    break;
+                default:
+                    setError(err.response?.data?.message || "Неизвестная ошибка.");
+            }
         } finally {
             setLoading(false);
         }
     };
+
 
     const disablePhotoInput = !replacePhotos && previewPhotos.length >= MAX_PHOTOS;
 

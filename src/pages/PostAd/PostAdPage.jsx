@@ -75,8 +75,27 @@ const PostAdPage = () => {
                 navigate("/ad/my-ads");
             }
         } catch (err) {
-            console.error("Ошибка Создания: ",err);
-            setError("Не удалось опубликовать объявление");
+            const code = err.response?.status;
+
+            if (code === 401) {
+                localStorage.removeItem("access_token");
+                navigate("/");
+                return;
+            }
+
+            switch (code) {
+                case 400:
+                    setError("Некорректные данные. Проверьте форму.");
+                    break;
+                case 413:
+                    setError("Слишком большой размер загружаемых данных.");
+                    break;
+                case 500:
+                    setError("Ошибка сервера. Повторите позже.");
+                    break;
+                default:
+                    setError(err.response?.data?.message || "Неизвестная ошибка.");
+            }
         } finally {
             setLoading(false);
         }

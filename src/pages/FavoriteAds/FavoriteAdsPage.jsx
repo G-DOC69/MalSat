@@ -36,8 +36,11 @@ const FavoriteAdsPage = () => {
         setLoading(true);
         setError(null);
 
-        getFavoritesRequest(token,controller.signal)
+        getFavoritesRequest(token, controller.signal)
             .then(res => {
+                if (!res || !Array.isArray(res.data)) {
+                    throw new Error("Некорректный формат данных");
+                }
                 const formatted = res.data.map(ad => ({
                     ...ad,
                     ageMonths: calculateAgeInMonths(ad.age)
@@ -46,10 +49,28 @@ const FavoriteAdsPage = () => {
                 setLoading(false);
             })
             .catch(err => {
-                if (err.name !== 'CanceledError') {
-                    setError('Ошибка загрузки.');
-                    setLoading(false);
+                if (err.name === 'CanceledError') return;
+
+                const code = err.response?.status;
+
+                if (code === 401) {
+                    localStorage.removeItem("access_token");
+                    navigate("/");
+                    return;
                 }
+
+                switch (code) {
+                    case 403:
+                        setError("Доступ запрещён.");
+                        break;
+                    case 500:
+                        setError("Ошибка сервера при загрузке избранного.");
+                        break;
+                    default:
+                        setError(err.response?.data?.message || "Ошибка загрузки.");
+                }
+
+                setLoading(false);
             });
 
         return () => controller.abort();

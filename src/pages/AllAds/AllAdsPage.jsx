@@ -37,22 +37,46 @@ const AllAdsPage = () => {
 
         getAllAdsRequest(controller.signal)
             .then(res => {
-                const formatted = res.data.map(ad => ({
-                    ...ad,
-                    ageMonths: calculateAgeInMonths(ad.age)
-                }));
+                if (!res || !res.data || !Array.isArray(res.data)) {
+                    throw new Error('Неверный формат данных');
+                }
+                const formatted = res.data.map(ad => {
+                    if (!ad || typeof ad.age !== 'string') {
+                        throw new Error('Некорректные данные объявления');
+                    }
+                    return {
+                        ...ad,
+                        ageMonths: calculateAgeInMonths(ad.age)
+                    };
+                });
                 setAds(formatted);
                 setLoading(false);
             })
             .catch(err => {
-                if (err.name !== 'CanceledError') {
-                    setError('Ошибка загрузки.');
-                    setLoading(false);
+                if (err.name === 'CanceledError') return;
+
+                const code = err.response?.status;
+
+                switch (code) {
+                    case 400:
+                        setError("Неверный запрос.");
+                        break;
+                    case 404:
+                        setError("Объявления не найдены.");
+                        break;
+                    case 500:
+                        setError("Ошибка сервера при загрузке объявлений.");
+                        break;
+                    default:
+                        setError('Ошибка загрузки: ' + (err.response?.data?.message || err.message));
                 }
+
+                setLoading(false);
             });
 
         return () => controller.abort();
     }, []);
+
 
     useEffect(() => {
         applyFilters(filter, ads, null, setFilteredAds);

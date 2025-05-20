@@ -97,10 +97,20 @@ const RegisterPage = () => {
                 setErrorMessage('Ошибка сервера');
             }
         } catch (err) {
-            if (err.response && err.response.status === 400) {
-                setErrorMessage("Данный почтовый адрес уже используется");
-            } else {
-                setErrorMessage("Произошла неизвестная ошибка. Попробуйте позже.");
+            const code = err.response?.status;
+
+            switch (code) {
+                case 400:
+                    setErrorMessage("Данный почтовый адрес уже используется");
+                    break;
+                case 409:
+                    setErrorMessage("Аккаунт с такими данными уже существует.");
+                    break;
+                case 500:
+                    setErrorMessage("Ошибка сервера. Попробуйте позже.");
+                    break;
+                default:
+                    setErrorMessage(err.response?.data?.message || "Неизвестная ошибка.");
             }
         }
     };

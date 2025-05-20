@@ -24,19 +24,36 @@ const ContactUsPage = () => {
         setError(false);
 
         try {
-            const res = await sendContactUsRequest(formData);
             setLoading(true);
+            const res = await sendContactUsRequest(formData);
+
             if (res.status === 200) {
                 setStatusMessage('Ваше сообщение отправлено. Мы свяжемся с вами при необходимости.');
                 setFormData({ email: '', topic: 'ads', content: '' });
             }
-        } catch {
+        } catch (err) {
+            const code = err.response?.status;
+
+            switch (code) {
+                case 400:
+                    setStatusMessage("Проверьте корректность введённых данных.");
+                    break;
+                case 429:
+                    setStatusMessage("Слишком много запросов. Попробуйте позже.");
+                    break;
+                case 500:
+                    setStatusMessage("Ошибка сервера. Попробуйте позже.");
+                    break;
+                default:
+                    setStatusMessage(err.response?.data?.message || "Неизвестная ошибка.");
+            }
+
             setError(true);
-            setStatusMessage('Ошибка при отправке. Попробуйте позже.');
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
+
 
     return (
         <Container>

@@ -55,13 +55,33 @@ const ChangeProfilePage = () => {
                 setSelectedCode(code);
                 setPhotoPreview(user.photoUrl);
             } catch (err) {
-                console.error("Ошибка при загрузке профиля:", err);
-                setError("Ошибка загрузки данных.");
+                const code = err.response?.status;
+
+                if (code === 401) {
+                    localStorage.removeItem("access_token");
+                    navigate("/");
+                    return;
+                }
+
+                switch (code) {
+                    case 403:
+                        setError("Доступ запрещён.");
+                        break;
+                    case 404:
+                        setError("Пользователь не найден.");
+                        break;
+                    case 500:
+                        setError("Ошибка сервера при загрузке профиля.");
+                        break;
+                    default:
+                        setError(err.response?.data?.message || "Ошибка загрузки данных.");
+                }
             }
         };
 
         fetchData();
     }, [token]);
+
 
     const validatePhoneNumber = (code, phoneNumber) => {
         const country = countryPhoneCodes.find(c => c.code === code);
@@ -140,8 +160,27 @@ const ChangeProfilePage = () => {
                 navigate('/profile');
             }
         } catch (err) {
-            console.error("Ошибка при обновлении:", err);
-            setError("Ошибка при обновлении профиля.");
+            const code = err.response?.status;
+
+            if (code === 401) {
+                localStorage.removeItem("access_token");
+                navigate("/");
+                return;
+            }
+
+            switch (code) {
+                case 403:
+                    setError("Неверный пароль.");
+                    break;
+                case 404:
+                    setError("Пользователь не найден.");
+                    break;
+                case 500:
+                    setError("Ошибка сервера при обновлении профиля.");
+                    break;
+                default:
+                    setError(err.response?.data?.message || "Неизвестная ошибка.");
+            }
         } finally {
             setLoading(false);
         }

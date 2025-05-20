@@ -45,7 +45,23 @@ const ChatPage = () => {
             const res = await getUserChatsRequest(token);
             setChats(res.data);
         } catch (err) {
-            console.error("Ошибка загрузки чатов:", err);
+            const code = err.response?.status;
+            if (code === 401) {
+                localStorage.removeItem("access_token");
+                window.location.href = "/";
+                return;
+            }
+
+            switch (code) {
+                case 403:
+                    console.error("Доступ к чатам запрещён.");
+                    break;
+                case 500:
+                    console.error("Ошибка сервера при загрузке чатов.");
+                    break;
+                default:
+                    console.error("Ошибка загрузки чатов:", err.response?.data?.message || err.message);
+            }
         }
     };
 
@@ -55,7 +71,26 @@ const ChatPage = () => {
             setChatData(res.data);
             setMessages(res.data.messages || []);
         } catch (err) {
-            console.error("Ошибка загрузки чата:", err);
+            const code = err.response?.status;
+            if (code === 401) {
+                localStorage.removeItem("access_token");
+                window.location.href = "/";
+                return;
+            }
+
+            switch (code) {
+                case 403:
+                    console.error("Нет доступа к выбранному чату.");
+                    break;
+                case 404:
+                    console.error("Чат не найден.");
+                    break;
+                case 500:
+                    console.error("Ошибка сервера при загрузке чата.");
+                    break;
+                default:
+                    console.error("Ошибка загрузки чата:", err.response?.data?.message || err.message);
+            }
         }
     };
 
@@ -65,15 +100,34 @@ const ChatPage = () => {
             const res = await getUnreadMessagesRequest(chatId, token);
             setMessages(prev => [...prev, ...res.data]);
         } catch (err) {
-            console.error("Ошибка загрузки новых сообщений:", err);
+            const code = err.response?.status;
+            if (code === 401) {
+                localStorage.removeItem("access_token");
+                window.location.href = "/";
+                return;
+            }
+
+            switch (code) {
+                case 403:
+                    console.error("Нет доступа к чату.");
+                    break;
+                case 404:
+                    console.error("Чат не найден.");
+                    break;
+                case 500:
+                    console.error("Ошибка сервера при получении новых сообщений.");
+                    break;
+                default:
+                    console.error("Ошибка при получении сообщений:", err.response?.data?.message || err.message);
+            }
         }
     };
 
     const sendMessage = async () => {
         if (!newMessage.trim() || newMessage.length > 300) return;
         try {
-            setLoading(true)
-            await fetchUnread(); // append new messages before sending
+            setLoading(true);
+            await fetchUnread(); // best-effort, its own catch handles errors
             await sendMessageRequest(chatId, token, newMessage);
             setMessages(prev => [...prev, {
                 text: newMessage,
@@ -83,11 +137,34 @@ const ChatPage = () => {
             }]);
             setNewMessage("");
         } catch (err) {
-            console.error("Ошибка отправки сообщения:", err);
+            const code = err.response?.status;
+            if (code === 401) {
+                localStorage.removeItem("access_token");
+                window.location.href = "/";
+                return;
+            }
+
+            switch (code) {
+                case 400:
+                    console.error("Недопустимое сообщение.");
+                    break;
+                case 403:
+                    console.error("Вы не можете отправлять сообщения в этот чат.");
+                    break;
+                case 404:
+                    console.error("Чат не найден.");
+                    break;
+                case 500:
+                    console.error("Ошибка сервера при отправке сообщения.");
+                    break;
+                default:
+                    console.error("Ошибка отправки сообщения:", err.response?.data?.message || err.message);
+            }
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
+
 
     return (
         <ChatContainer>

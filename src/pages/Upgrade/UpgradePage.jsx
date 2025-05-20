@@ -33,11 +33,27 @@ const UpgradePage = () => {
     useEffect(() => {
         const fetchEligibility = async () => {
             try {
-                const res = await checkUpgradeEligibility( adId,token);
+                const res = await checkUpgradeEligibility(adId, token);
                 setTariffs(res.data.tariffs);
                 setQrUrl(res.data.qrPhotoUrl);
-            } catch {
-                navigate('/');
+            } catch (err) {
+                const code = err.response?.status;
+
+                switch (code) {
+                    case 403:
+                        setMessage("Вы не являетесь владельцем этого объявления.");
+                        break;
+                    case 404:
+                        setMessage("Объявление не найдено.");
+                        break;
+                    case 409:
+                        setMessage("Объявление уже имеет повышенный статус.");
+                        break;
+                    default:
+                        setMessage("Ошибка сервера при проверке возможности повышения.");
+                }
+
+                navigate("/");
             }
         };
         fetchEligibility();
@@ -98,8 +114,16 @@ const UpgradePage = () => {
             const msg = res.headers['x-message'];
             setMessage(msg || 'Чек принят, ожидайте проверки.');
             setSubmitted(true);
-        } catch {
-            setMessage('Ошибка при загрузке.');
+        } catch (err) {
+            const code = err.response?.status;
+
+            switch (code) {
+                case 400:
+                    setMessage("Неверные параметры приоритета или длительности.");
+                    break;
+                default:
+                    setMessage("Ошибка сервера при загрузке чека.");
+            }
         }
     };
 

@@ -23,7 +23,26 @@ const ConfirmEmailPage = () => {
             try {
                 const res = await confirmEmailRequest(token);
                 setStatus(res.status === 200 ? "success" : "error");
-            } catch {
+            } catch (err) {
+                const code = err.response?.status;
+
+                switch (code) {
+                    case 400:
+                        console.error("Ссылка недействительна или устарела.");
+                        break;
+                    case 404:
+                        console.error("Пользователь с таким токеном не найден.");
+                        break;
+                    case 410:
+                        console.error("Срок действия ссылки истёк.");
+                        break;
+                    case 500:
+                        console.error("Ошибка сервера при подтверждении аккаунта.");
+                        break;
+                    default:
+                        console.error("Неизвестная ошибка при подтверждении:", err.response?.data?.message || err.message);
+                }
+
                 setStatus("error");
             }
         };

@@ -47,11 +47,32 @@ const ChangePasswordPage = () => {
                     localStorage.removeItem("access_token");
                     navigate("/login");
                 }, 2000);
-            } else {
-                setError("Не удалось изменить пароль.");
             }
         } catch (err) {
-            setError(err.response?.data?.message || "Ошибка сервера.");
+            const code = err.response?.status;
+
+            if (code === 401) {
+                localStorage.removeItem("access_token");
+                navigate("/login");
+                return;
+            }
+
+            switch (code) {
+                case 400:
+                    setError("Неверный текущий пароль или некорректные данные.");
+                    break;
+                case 403:
+                    setError("Нет доступа к изменению пароля.");
+                    break;
+                case 404:
+                    setError("Пользователь не найден.");
+                    break;
+                case 500:
+                    setError("Внутренняя ошибка сервера.");
+                    break;
+                default:
+                    setError(err.response?.data?.message || "Неизвестная ошибка.");
+            }
         } finally {
             setLoading(false);
         }

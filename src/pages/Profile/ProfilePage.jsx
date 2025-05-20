@@ -34,7 +34,8 @@ const ProfilePage = () => {
         try {
             const res = targetId
                 ? await getUserByIdRequest(targetId, token)
-                : await getUserRequest(token );
+                : await getUserRequest(token);
+
             const profileData = res.data;
             setProfile(profileData);
 
@@ -43,11 +44,32 @@ const ProfilePage = () => {
             setAds(adsData.slice(0, 10));
             setHasMoreAds(adsData.length > 10);
         } catch (err) {
-            console.error("Ошибка загрузки профиля:", err);
+            const code = err.response?.status;
+
+            if (code === 401) {
+                localStorage.removeItem("access_token");
+                window.location.href = "/";
+                return;
+            }
+
+            switch (code) {
+                case 403:
+                    console.error("Доступ к профилю запрещён.");
+                    break;
+                case 404:
+                    console.error("Пользователь не найден.");
+                    break;
+                case 500:
+                    console.error("Ошибка сервера при загрузке профиля.");
+                    break;
+                default:
+                    console.error("Неизвестная ошибка:", err.response?.data?.message || err.message);
+            }
         } finally {
             setLoading(false);
         }
     };
+
 
     const restoreAllAds = () => {
         setAds(allAds);

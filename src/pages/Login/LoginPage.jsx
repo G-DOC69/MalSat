@@ -50,10 +50,21 @@ const LoginPage = () => {
                 setError("Ошибка авторизации");
             }
         } catch (err) {
-            if (err.response?.status === 429) {
-                setError("Слишком много попыток. Попробуйте позже.");
-            } else {
-                setError(err.response?.data || "Ошибка сервера. Попробуйте позже.");
+            const code = err.response?.status;
+
+            switch (code) {
+                case 400:
+                case 401:
+                    setError("Неправильный логин или пароль.");
+                    break;
+                case 429:
+                    setError("Слишком много попыток. Попробуйте позже.");
+                    break;
+                case 500:
+                    setError("Ошибка сервера. Попробуйте позже.");
+                    break;
+                default:
+                    setError(err.response?.data || "Неизвестная ошибка.");
             }
         }
         finally {

@@ -14,11 +14,25 @@ const HomePage = () => {
         const getAds = async () => {
             try {
                 const response = await fetchTopAdsRequest();
-                if (response.status === 200) {
-                    setAds(response.data || []);
+
+                if (!response || !Array.isArray(response.data)) {
+                    throw new Error("Некорректный формат данных.");
                 }
-            } catch (error) {
-                console.error("Ошибка при получении объявлений:", error);
+
+                setAds(response.data);
+            } catch (err) {
+                const code = err.response?.status;
+
+                switch (code) {
+                    case 400:
+                        console.error("Неверный запрос к серверу.");
+                        break;
+                    case 500:
+                        console.error("Ошибка сервера при получении объявлений.");
+                        break;
+                    default:
+                        console.error("Ошибка при получении объявлений:", err.response?.data?.message || err.message);
+                }
             }
         };
 

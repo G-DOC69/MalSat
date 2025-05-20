@@ -52,7 +52,22 @@ const PasswordResetPage = () => {
                 setError("Не удалось сбросить пароль.");
             }
         } catch (err) {
-            setError(err.response?.data?.message || "Ошибка сервера.");
+            const code = err.response?.status;
+
+            switch (code) {
+                case 400:
+                    setError("Некорректный запрос. Проверьте данные.");
+                    break;
+                case 401:
+                case 410:
+                    setError("Срок действия ссылки истёк или она недействительна.");
+                    break;
+                case 500:
+                    setError("Ошибка сервера. Попробуйте позже.");
+                    break;
+                default:
+                    setError(err.response?.data?.message || "Неизвестная ошибка.");
+            }
         } finally {
             setLoading(false);
         }

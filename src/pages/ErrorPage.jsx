@@ -3,7 +3,10 @@ import React from 'react';
 const ErrorPage = () => {
     return (
         <div>
-            error
+            Такой Страницы не существует!
+            <br/>
+            <br/>
+            Бул баракча жок!
         </div>
     );
 };
