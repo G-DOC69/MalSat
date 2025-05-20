@@ -95,7 +95,11 @@ const RegisterPage = () => {
             }
         } catch (err) {
             console.log("Response Error: ", err);
-            setErrorMessage('Ошибка подключения к серверу');
+            if(response.status===400){
+                setErrorMessage('Email уже используется')
+            }
+            else{setErrorMessage('Ошибка подключения к серверу');}
+            
         }
     };
 

@@ -1,37 +1,35 @@
 import { Link } from "react-router-dom";
 import {
-    HeaderContainer,
-    InfoBlock,
-    HeaderImage
+  HeaderContainer,
+  InfoBlock,
+  HeaderImage,
+  NameText,
+  RefreshButton,
 } from "./ChatHeaderStyle";
 
 const ChatHeader = ({ adId, adPhotoUrl, adAnimal, adBreed, otherUser, onRefresh }) => {
-    return (
-        <HeaderContainer>
-            <InfoBlock>
-                <Link to={`/ad/${adId}`}>
-                    <HeaderImage src={adPhotoUrl} alt="Ad" />
-                </Link>
-                <Link to={`/ad/${adId}`}>
-                    <div>
-                        <h3>{adAnimal} {adBreed}</h3>
-                    </div>
-                </Link>
-            </InfoBlock>
+  return (
+    <HeaderContainer>
+      <InfoBlock>
+        <Link to={`/ad/${adId}`}>
+          <HeaderImage src={adPhotoUrl} alt="Ad" />
+        </Link>
+        <Link to={`/ad/${adId}`}>
+          <NameText>{adAnimal} {adBreed}</NameText>
+        </Link>
+      </InfoBlock>
 
-            <InfoBlock>
-                <Link to={`/profile/${otherUser.id}`}>
-                    <HeaderImage src={otherUser.photoUrl} alt="User" />
-                </Link>
-                <Link to={`/profile/${otherUser.id}`}>
-                    <div>
-                        <p>{otherUser.username}</p>
-                    </div>
-                </Link>
-                <button onClick={onRefresh}>Обновить</button>
-            </InfoBlock>
-        </HeaderContainer>
-    );
+      <InfoBlock>
+        <Link to={`/profile/${otherUser.id}`}>
+          <HeaderImage src={otherUser.photoUrl} alt="User" />
+        </Link>
+        <Link to={`/profile/${otherUser.id}`}>
+          <NameText>{otherUser.username}</NameText>
+        </Link>
+        <RefreshButton onClick={onRefresh}>🔄 Обновить</RefreshButton>
+      </InfoBlock>
+    </HeaderContainer>
+  );
 };
 
 export default ChatHeader;

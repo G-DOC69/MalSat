@@ -48,7 +48,9 @@ export const getUserNotificationsRequest = (token) => {
 // --- AuthController ---
 export const loginUserRequest = (formData) => axios.post('/users/login', formData);
 export const registerUserRequest = (formData) => axios.post('/users/register', formData);
-export const confirmEmailRequest = (token) => axios.get(`/users/confirm-email/${token}`);
+export const confirmEmailRequest = (token) =>
+    axios.get(`/users/confirm-email/${token}`);
+  
 export const requestPasswordReset = (email) => axios.post(`/users/request-password-reset?email=${email}`);
 export const resetPassword = (token, newPassword) => axios.put(`/users/reset-password?token=${token}&newPassword=${newPassword}`);
 export const changePassword = (token, oldPassword, newPassword) => {

@@ -1,34 +1,37 @@
 import { useNavigate } from "react-router-dom";
 import {
-    Sidebar,
-    ChatItem,
-    ProfileImage
+  Sidebar,
+  ChatItem,
+  ProfileImage,
+  ChatInfo,
+  ChatName,
+  Title
 } from "./ChatSidebarStyle";
 
 const ChatSidebar = ({ chats = [], currentId }) => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    return (
-        <Sidebar>
-            <h3>Чаты</h3>
-            {chats.map(chat => (
-                <ChatItem
-                    key={chat.id}
-                    selected={String(currentId) === String(chat.id)}
-                    onClick={() => {
-                        if (String(currentId) !== String(chat.id)) {
-                            navigate(`/chat/${chat.id}`);
-                        }
-                    }}
-                >
-                    <ProfileImage src={chat.adPhotoUrl} alt="Ad" />
-                    <div>
-                        <p><strong>{chat.adAnimal} {chat.adBreed}</strong></p>
-                    </div>
-                </ChatItem>
-            ))}
-        </Sidebar>
-    );
+  return (
+    <Sidebar>
+      <Title>Чаты</Title>
+      {chats.map(chat => (
+        <ChatItem
+          key={chat.id}
+          selected={String(currentId) === String(chat.id)}
+          onClick={() => {
+            if (String(currentId) !== String(chat.id)) {
+              navigate(`/chat/${chat.id}`);
+            }
+          }}
+        >
+          <ProfileImage src={chat.adPhotoUrl} alt="Ad" />
+          <ChatInfo>
+            <ChatName>{chat.adAnimal} {chat.adBreed}</ChatName>
+          </ChatInfo>
+        </ChatItem>
+      ))}
+    </Sidebar>
+  );
 };
 
 export default ChatSidebar;

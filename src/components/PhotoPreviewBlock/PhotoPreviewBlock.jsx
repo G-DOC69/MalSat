@@ -1,6 +1,7 @@
 import React from 'react';
 import {
     PreviewContainer,
+    PreviewGrid,
     PreviewImage,
     Title
 } from './PhotoPreviewBlockStyle';
@@ -11,9 +12,11 @@ const PhotoPreviewBlock = ({ previewPhotos }) => {
     return (
         <PreviewContainer>
             <Title>Текущие фотографии</Title>
-            {previewPhotos.map((url, index) => (
-                <PreviewImage key={index} src={url} alt={`Фото ${index + 1}`} />
-            ))}
+            <PreviewGrid>
+                {previewPhotos.map((url, index) => (
+                    <PreviewImage key={index} src={url} alt={`Фото ${index + 1}`} />
+                ))}
+            </PreviewGrid>
         </PreviewContainer>
     );
 };
