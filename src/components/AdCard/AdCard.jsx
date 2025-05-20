@@ -1,12 +1,17 @@
 import { useNavigate } from "react-router-dom";
-import { AdCardStyled, AdImage, AdTitle, AdText } from "./AdCardStyle";
+import {
+    AdCardStyled,
+    AdImage,
+    AdTitle,
+    AdText,
+    Price // ⬅ добавлен импорт
+} from "./AdCardStyle";
 import { calculateAgeInMonths, calculateAgeInYears } from "../../app/store";
 import React from "react";
 
 const AdCard = ({ ad }) => {
     const navigate = useNavigate();
     if (!ad) return null;
-
 
     const handleClick = () => {
         navigate(`/ad/${ad.id}`);
@@ -21,8 +26,9 @@ const AdCard = ({ ad }) => {
             <AdTitle>{ad.animal} — {ad.breed}</AdTitle>
             <AdText>Возраст: {ageLabel}</AdText>
             <AdText>Регион: {ad.region}</AdText>
-            <AdText>Цена: {ad.price} сом</AdText>
             <AdText>Приоритет: {ad.priority}</AdText>
+            
+            <Price>{ad.price} сом</Price> {/* ⬅ ЦЕНА ВНИЗУ */}
         </AdCardStyled>
     );
 };
