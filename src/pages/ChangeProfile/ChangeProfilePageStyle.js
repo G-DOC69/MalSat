@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const FormContainer = styled.div`
     max-width: 400px;
     margin: auto;
+    margin: 80 px;
     padding: 20px;
     background: white;
     border-radius: 10px;

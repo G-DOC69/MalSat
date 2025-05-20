@@ -1,10 +1,10 @@
 import './App.css';
-import {BrowserRouter} from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import Routers from './app/Routers.jsx';
-import {createContext, useState} from 'react';
+import { createContext, useState } from 'react';
 import Topbar from "./components/navbar/TopBar";
+import Footer from "./components/Footer/Footer"; // 👈 добавили футер
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const UserContext = createContext();
 
 function App() {
@@ -12,8 +12,9 @@ function App() {
 
     return (
         <UserContext.Provider value={[user, setUser]}>
-            <Topbar/>
+            <Topbar />
             <Routers />
+            <Footer /> {/* 👈 футер внизу после всех роутов */}
         </UserContext.Provider>
     );
 }

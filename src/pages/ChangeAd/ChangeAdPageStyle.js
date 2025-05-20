@@ -1,20 +1,24 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 20px;
-    max-width: 800px;
-    margin: auto;
-`;
+  display: flex;
+  justify-content: center;
+  padding: 40px 24px;
+  margin-top: 80px;
+  `;
 
 export const FormSection = styled.div`
-    flex: 1;
-    min-width: 300px;
+  width: 100%;
+  max-width: 800px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 `;
 
 export const Title = styled.h2`
-    font-size: 24px;
-    color: #1e3a8a;
+  font-size: 26px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 24px;
 `;

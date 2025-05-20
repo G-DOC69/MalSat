@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import {useParams, useNavigate, Link} from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
     getAdRequest,
     createChatRequest,
@@ -10,12 +10,21 @@ import {
 } from "../../app/api";
 import { calculateAgeInMonths, calculateAgeInYears } from "../../app/store";
 import {
-    Container, InfoSection, Title, List,
-    Button, FavoriteButton, DeliveryForm, FormGroup, Input, ErrorText
+    Container,
+    InfoSection,
+    ImageSection,
+    Title,
+    List,
+    Button,
+    FavoriteButton,
+    DeliveryForm,
+    FormGroup,
+    Input,
+    ErrorText
 } from "./OneAdPageStyle";
 import PhotoCarousel from "../../components/Ad/PhotoCarousel/PhotoCarousel.jsx";
 import SellerPreview from "../../components/Ad/SellerPreview/SellerPreview.jsx";
-import {useSyncUserContext} from "../../hooks/useSyncUserContext.js";
+import { useSyncUserContext } from "../../hooks/useSyncUserContext.js";
 
 const OneAdPage = () => {
     const { id } = useParams();
@@ -29,7 +38,7 @@ const OneAdPage = () => {
     const [deliverySubmitting, setDeliverySubmitting] = useState(false);
     const token = localStorage.getItem("access_token");
 
-    useSyncUserContext()
+    useSyncUserContext();
 
     const isValidPhone = (phone) => /^[\d\s()+-]{5,20}$/.test(phone);
 
@@ -44,13 +53,11 @@ const OneAdPage = () => {
                 }
             } catch (err) {
                 const code = err.response?.status;
-
                 if (code === 401) {
                     localStorage.removeItem("access_token");
                     navigate("/");
                     return;
                 }
-
                 switch (code) {
                     case 403:
                         console.error("Доступ к объявлению запрещён.");
@@ -62,7 +69,7 @@ const OneAdPage = () => {
                         console.error("Ошибка сервера при загрузке объявления.");
                         break;
                     default:
-                        console.error("Ошибка при загрузке объявления:", err.response?.data?.message || err.message);
+                        console.error("Ошибка при загрузке объявления:", err.message);
                 }
             }
         };
@@ -73,29 +80,24 @@ const OneAdPage = () => {
         if (!ad) return;
         setLoadingChat(true);
         try {
-            const res = await createChatRequest( token,ad.id);
+            const res = await createChatRequest(token, ad.id);
             navigate(`/chat/${res.data.chatId}`);
         } catch (err) {
             const code = err.response?.status;
-
             if (code === 401) {
                 localStorage.removeItem("access_token");
                 navigate("/");
                 return;
             }
-
             switch (code) {
                 case 403:
-                    console.error("Вы не можете начать чат по этому объявлению.");
+                    console.error("Вы не можете начать чат.");
                     break;
                 case 404:
-                    console.error("Объявление для чата не найдено.");
-                    break;
-                case 500:
-                    console.error("Ошибка сервера при создании чата.");
+                    console.error("Объявление не найдено.");
                     break;
                 default:
-                    console.error("Ошибка при открытии чата:", err.response?.data?.message || err.message);
+                    console.error("Ошибка при открытии чата:", err.message);
             }
         } finally {
             setLoadingChat(false);
@@ -113,25 +115,17 @@ const OneAdPage = () => {
             setAd(prev => ({ ...prev, isFavorite: res.data }));
         } catch (err) {
             const code = err.response?.status;
-
             if (code === 401) {
                 localStorage.removeItem("access_token");
                 navigate("/");
                 return;
             }
-
             switch (code) {
                 case 403:
-                    console.error("Нет прав на изменение избранного.");
-                    break;
                 case 404:
-                    console.error("Объявление не найдено.");
-                    break;
                 case 500:
-                    console.error("Ошибка сервера при изменении избранного.");
+                    console.error("Ошибка при избранном:", err.message);
                     break;
-                default:
-                    console.error("Ошибка при избранном:", err.response?.data?.message || err.message);
             }
         } finally {
             setFavoriteLoading(false);
@@ -157,29 +151,12 @@ const OneAdPage = () => {
             setDeliveryForm({ phone: '', address: '' });
         } catch (err) {
             const code = err.response?.status;
-
             if (code === 401) {
                 localStorage.removeItem("access_token");
                 navigate("/");
                 return;
             }
-
-            switch (code) {
-                case 400:
-                    setDeliveryError("Неверные данные для доставки.");
-                    break;
-                case 403:
-                    setDeliveryError("Вы не можете заказать доставку этого объявления.");
-                    break;
-                case 404:
-                    setDeliveryError("Объявление не найдено.");
-                    break;
-                case 500:
-                    setDeliveryError("Ошибка сервера при создании доставки.");
-                    break;
-                default:
-                    setDeliveryError(err.response?.data?.message || "Неизвестная ошибка.");
-            }
+            setDeliveryError(err.response?.data?.message || "Ошибка доставки.");
         } finally {
             setDeliverySubmitting(false);
         }
@@ -256,6 +233,7 @@ const OneAdPage = () => {
                         )}
                     </>
                 )}
+
                 {token && ad.owner && (
                     <>
                         <Button onClick={() => navigate(`/ad/change/${ad.id}`)}>
@@ -268,7 +246,9 @@ const OneAdPage = () => {
                 )}
             </InfoSection>
 
-            <PhotoCarousel photos={ad.photoUrls} />
+            <ImageSection>
+                <PhotoCarousel photos={ad.photoUrls} />
+            </ImageSection>
         </Container>
     );
 };

@@ -3,7 +3,7 @@ import styled from "styled-components";
 // === Навбар с градиентом, тенью и липкостью ===
 export const Navbar = styled.nav`
   width: 100%;
-  height: 64px;
+  height: 70px;
   background: linear-gradient(90deg, #1e3a8a, #3b82f6);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   display: flex;
@@ -17,19 +17,19 @@ export const Navbar = styled.nav`
   backdrop-filter: blur(4px);
 `;
 
-// === Название сайта — центрировано и кликабельно ===
 export const SiteTitle = styled.h1`
   font-size: 1.6rem;
-  font-weight: 700;
+  font-weight: 720;
   cursor: pointer;
-  flex-grow: 1;
-  text-align: center;
+  text-align: left; /* ← не по центру */
   transition: transform 0.3s ease;
+  margin-right: auto; /* ← отталкивает всё вправо */
 
   &:hover {
     transform: scale(1.05);
   }
 `;
+
 
 // === Кнопки меню справа ===
 export const NavList = styled.ul`
