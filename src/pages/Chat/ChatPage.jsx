@@ -9,7 +9,7 @@ import {
 import { useCheckUser } from "../../hooks/useCheckUser";
 import { ChatContainer } from "./ChatPageStyle";
 
-import ChatSidebar from "../../components/Chat/ChatSidebar/ChatSidebar123";
+import ChatSidebar from "../../components/Chat/ChatSidebar/ChatSidebar";
 import ChatHeader from "../../components/chat/ChatHeader/ChatHeader";
 import ChatMessages from "../../components/chat/ChatMessages/ChatMessages";
 import ChatInputBar from "../../components/chat/ChatInputBar/ChatInputBar";
