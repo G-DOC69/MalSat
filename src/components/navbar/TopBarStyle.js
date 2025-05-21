@@ -36,10 +36,15 @@ export const NavList = styled.ul`
   display: flex;
   align-items: center;
   list-style: none;
-  gap: 20px;
+  gap: 16px;
+
+  @media (max-width: 600px) {
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
 `;
 
-// === Кнопки входа/регистрации ===
 export const NavButton = styled.button`
   background-color: white;
   color: #1e3a8a;
@@ -49,11 +54,17 @@ export const NavButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 14px;
 
   &:hover {
     background-color: #e0e7ff;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (max-width: 600px) {
+    font-size: 13px;
+    padding: 6px 10px;
   }
 `;
 
@@ -114,3 +125,5 @@ export const MenuLink = styled.button`
     transform: translateX(4px);
   }
 `;
+
+

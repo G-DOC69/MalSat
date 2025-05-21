@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { fetchTopAdsRequest } from "../../app/api";
-import { Container, AdsGrid, SectionTitle } from "./HomePageStyle";
+import {
+  BackgroundWrapper,
+  Overlay,
+  Container as HomeContainer,
+  AdsGrid,
+  SectionTitle,
+  SectionHighlight
+  
+} from "./HomePageStyle";
 import AdCard from "../../components/AdCard/AdCard.jsx";
 import PostAdButton from "../../components/PostAdButton/PostAdButton.jsx";
 import { useSyncUserContext } from "../../hooks/useSyncUserContext.js";
@@ -11,10 +19,22 @@ import {
   FeatureText
 } from "../../components/Ad/AdFeatures/AdFeaturesStyle";
 
+const backgroundImages = ["/bg1.jpg", "/bg2.jpg", "/bg3.jpg", "/bg4.jpg"];
+
 const HomePage = () => {
   const [ads, setAds] = useState([]);
+  const [bgIndex, setBgIndex] = useState(0);
 
   useSyncUserContext();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBgIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
+    }, 10000); // ← теперь 10 секунд
+  
+    return () => clearInterval(interval);
+  }, []);
+  
 
   useEffect(() => {
     const getAds = async () => {
@@ -34,7 +54,7 @@ const HomePage = () => {
             console.error("Ошибка сервера при получении объявлений.");
             break;
           default:
-            console.error("Ошибка при получении объявлений:", err.response?.data?.message || err.message);
+            console.error("Ошибка при получении объявлений:", err.message);
         }
       }
     };
@@ -42,43 +62,39 @@ const HomePage = () => {
   }, []);
 
   return (
-    <Container>
-      <SectionTitle>Почему выбирают нас</SectionTitle>
-      <FeaturesWrapper>
-        <FeatureCard>
-          <div>
+    <BackgroundWrapper style={{ backgroundImage: `url(${backgroundImages[bgIndex]})` }}>
+      <Overlay />
+      <HomeContainer>
+      <SectionHighlight>
+      <SectionTitle>Почему выбирают нас</SectionTitle></SectionHighlight>
+        <FeaturesWrapper>
+          <FeatureCard>
             <FeatureTitle>Проверенные объявления</FeatureTitle>
             <FeatureText>Каждое объявление проходит модерацию перед публикацией.</FeatureText>
-          </div>
-        </FeatureCard>
-        <FeatureCard>
-          <div>
+          </FeatureCard>
+          <FeatureCard>
             <FeatureTitle>Быстрая доставка</FeatureTitle>
             <FeatureText>Удобная доставка по всей стране прямо к двери.</FeatureText>
-          </div>
-        </FeatureCard>
-        <FeatureCard>
-          <div>
+          </FeatureCard>
+          <FeatureCard>
             <FeatureTitle>Поддержка 24/7</FeatureTitle>
             <FeatureText>Наша команда всегда на связи для вашей помощи.</FeatureText>
-          </div>
-        </FeatureCard>
-        <FeatureCard>
-          <div>
+          </FeatureCard>
+          <FeatureCard>
             <FeatureTitle>Удобный интерфейс</FeatureTitle>
             <FeatureText>Публикуйте и ищите объявления в пару кликов.</FeatureText>
-          </div>
-        </FeatureCard>
-      </FeaturesWrapper>
-
-      <SectionTitle>Лучшие предложения</SectionTitle>
-      <AdsGrid>
-        {ads.map((ad) => (
-          <AdCard key={ad.id} ad={ad} />
-        ))}
-      </AdsGrid>
-      <PostAdButton />
-    </Container>
+          </FeatureCard>
+        </FeaturesWrapper>
+        
+        <SectionHighlight><SectionTitle>Лучшие предложения</SectionTitle></SectionHighlight>
+        <AdsGrid>
+          {ads.map((ad) => (
+            <AdCard key={ad.id} ad={ad} />
+          ))}
+        </AdsGrid>
+        <PostAdButton />
+      </HomeContainer>
+    </BackgroundWrapper>
   );
 };
 
