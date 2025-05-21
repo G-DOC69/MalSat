@@ -10,10 +10,10 @@ import { useCheckUser } from "../../hooks/useCheckUser";
 import { ChatContainer } from "./ChatPageStyle";
 
 import ChatSidebar from "../../components/Chat/ChatSidebar/ChatSidebar";
-import ChatHeader from "../../components/chat/ChatHeader/ChatHeader";
-import ChatMessages from "../../components/chat/ChatMessages/ChatMessages";
-import ChatInputBar from "../../components/chat/ChatInputBar/ChatInputBar";
-import EmptyChatPlaceholder from "../../components/chat/EmptyChatPlaceholder/EmptyChatPlaceholder";
+import ChatHeader from "../../components/Chat/ChatHeader/ChatHeader";
+import ChatMessages from "../../components/Chat/ChatMessages/ChatMessages";
+import ChatInputBar from "../../components/Chat/ChatInputBar/ChatInputBar";
+import EmptyChatPlaceholder from "../../components/Chat/EmptyChatPlaceholder/EmptyChatPlaceholder";
 
 const ChatPage = () => {
     const { chatId } = useParams();
