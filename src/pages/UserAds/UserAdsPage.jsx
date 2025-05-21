@@ -10,84 +10,87 @@ import FilterWindow from "../../components/FilterWindow/FilterWindow.jsx";
 import Pagination from "../../components/Pagination/Pagination.jsx";
 
 const UserAdsPage = () => {
-    const [ads, setAds] = useState([]);
-    const [filteredAds, setFilteredAds] = useState([]);
-    const [page, setPage] = useState(1);
-    const [totalItems, setTotalItems] = useState(0);
-    const [filter, setFilter] = useState({
-        animal: "",
-        breed: "",
-        minAge: "",
-        maxAge: "",
-        region: "",
-        minPrice: "",
-        maxPrice: ""
-    });
+  const [ads, setAds] = useState([]);
+  const [filteredAds, setFilteredAds] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [filter, setFilter] = useState({
+    animal: "",
+    breed: "",
+    minAge: "",
+    maxAge: "",
+    region: "",
+    minPrice: "",
+    maxPrice: ""
+  });
 
-    const itemsPerPage = 10;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const navigate = useNavigate();
+  const itemsPerPage = 10;
+  const navigate = useNavigate();
 
-    useCheckUser();
+  useCheckUser();
 
-    useEffect(() => {
-        const fetchUserAds = async () => {
-            try {
-                const token = localStorage.getItem("access_token");
-                const res = await getUserAdsRequest(token);
-                setAds(res.data || []);
-            } catch (err) {
-                const code = err.response?.status;
+  useEffect(() => {
+    const fetchUserAds = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          navigate("/");
+          return;
+        }
 
-                if (code === 401) {
-                    localStorage.removeItem("access_token");
-                    navigate("/");
-                    return;
-                }
+        const res = await getUserAdsRequest(token);
+        setAds(res.data || []);
+      } catch (err) {
+        const code = err.response?.status;
 
-                switch (code) {
-                    case 403:
-                        console.error("Доступ к объявлениям запрещён.");
-                        break;
-                    case 500:
-                        console.error("Ошибка сервера при загрузке объявлений.");
-                        break;
-                    default:
-                        console.error("Неизвестная ошибка:", err.response?.data?.message || err.message);
-                }
-            }
-        };
-        fetchUserAds();
-    }, []);
+        if (code === 401) {
+          localStorage.removeItem("access_token");
+          navigate("/");
+        } else {
+          const errorMessages = {
+            403: "Доступ к объявлениям запрещён.",
+            500: "Ошибка сервера при загрузке объявлений."
+          };
+          console.error(errorMessages[code] || "Неизвестная ошибка:", err.response?.data?.message || err.message);
+        }
+      }
+    };
 
-    useEffect(() => {
-        applyFilters(filter, ads, setTotalItems, setFilteredAds, itemsPerPage, page);
-    }, [filter, ads, page]);
+    fetchUserAds();
+  }, [navigate]);
 
-    useEffect(() => {
-        setPage(1);
-    }, [filter]);
+  useEffect(() => {
+    applyFilters(filter, ads, setTotalItems, setFilteredAds, itemsPerPage, page);
+  }, [filter, ads, page]);
 
-    return (
-        <Container>
-            <h1>Мои Объявления</h1>
-            <FilterWindow filter={filter} setFilter={setFilter} ads={ads} />
-            <AdsGrid>
-                {filteredAds.map(ad => (
-                    <AdCard key={ad.id} ad={ad} navigate={navigate} />
-                ))}
-            </AdsGrid>
-            {totalPages > 1 && (
-                <Pagination
-                    page={page}
-                    setPage={setPage}
-                    totalPages={totalPages}
-                    totalItems={totalItems}
-                    itemsPerPage={itemsPerPage}
-                />
-            )}
-        </Container>
-    );
+  useEffect(() => {
+    setPage(1);
+  }, [filter]);
+
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  return (
+    <Container>
+      <h1>Мои Объявления</h1>
+      <FilterWindow filter={filter} setFilter={setFilter} ads={ads} />
+      <AdsGrid>
+        {filteredAds.length > 0 ? (
+          filteredAds.map((ad) => <AdCard key={ad.id} ad={ad} navigate={navigate} />)
+        ) : (
+          <p>Нет объявлений по текущим фильтрам.</p>
+        )}
+      </AdsGrid>
+      {totalPages > 1 && (
+        <Pagination
+          page={page}
+          setPage={setPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+        />
+      )}
+    </Container>
+  );
 };
 
 export default UserAdsPage;

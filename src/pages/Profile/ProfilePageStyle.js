@@ -27,14 +27,18 @@ const zoomIn = keyframes`
 export const ProfileContainer = styled.div`
   width: 100%;
   max-width: 1200px;
-  margin: 80px auto;
-  padding: 20px;
+  margin: 80px auto 40px;
+  padding: 24px;
   animation: ${fadeIn} 0.6s ease forwards;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 `;
 
 // Заголовок для объявлений
 export const AdsTitle = styled.h3`
   margin-top: 20px;
+  margin-bottom: 10px;
   text-align: center;
   font-size: 24px;
   font-weight: 600;
@@ -46,17 +50,21 @@ export const AdsTitle = styled.h3`
 export const AdsContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-  padding: 10px;
+  gap: 24px;
+  padding: 16px;
   animation: ${zoomIn} 0.4s ease-in-out;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 // Кнопка "Загрузить ещё"
 export const LoadMoreButton = styled.button`
   display: block;
-  margin: 30px auto;
+  margin: 30px auto 0;
   background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-  color: white;
+  color: #ffffff;
   padding: 14px 24px;
   border: none;
   border-radius: 10px;
